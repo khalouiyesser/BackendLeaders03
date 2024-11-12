@@ -8,6 +8,12 @@ export class VideoService {
     return 'This action adds a new video';
   }
 
+
+  upload(url: string) {
+    const file = new File([url], "filename"); // Utilisez un tableau de données pour initialiser le fichier
+  }
+
+
   findAll() {
     return `This action returns all video`;
   }
