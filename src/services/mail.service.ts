@@ -18,13 +18,18 @@ export class MailService {
     });
   }
 
-  async sendPasswordResetEmail(to: string, token: string) {
-    const resetLink = `http://yourapp.com/reset-password?token=${token}`;
+  async sendPasswordResetEmail(to: string, otp: number) {
+    // const resetLink = `http://yourapp.com/reset-password?token=${token}`;
     const mailOptions = {
       from: 'Auth-backend service',
-      to: to,
+      to: to, // Adresse email de l'utilisateur
       subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p><p><a href="${resetLink}">Reset Password</a></p>`,
+      html: `
+        <p>Vous avez demandé une réinitialisation de mot de passe.</p>
+        <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+        <p>${otp}</p>
+        <p>Ce lien expirera dans 1 heure.</p>
+      `,
     };
 
     await this.transporter.sendMail(mailOptions);

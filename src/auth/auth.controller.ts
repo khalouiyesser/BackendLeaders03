@@ -27,14 +27,14 @@ export class AuthController {
     return this.authService.refreshTokens(refreshTokenDto.refreshToken);
   }
 
-  @UseGuards(AuthenticationGuard)
+  // @UseGuards(AuthenticationGuard)
   @Put('change-password')
   async changePassword(
-    @Body() changePasswordDto: ChangePasswordDto,
-    @Req() req,
+    @Body() changePasswordDto: ChangePasswordDto
+    // @Req() req,
   ) {
     return this.authService.changePassword(
-      req.userId,
+      changePasswordDto.user_id,
       changePasswordDto.oldPassword,
       changePasswordDto.newPassword,
     );
@@ -45,10 +45,10 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
-  @Post('yes')
-  async ye(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.authService.mail();
-  }
+  // @Post('yes')
+  // async ye(@Body() forgotPasswordDto: ForgotPasswordDto) {
+  //   return this.authService.mail();
+  // }
 
   @Put('reset-password')
   async resetPassword(

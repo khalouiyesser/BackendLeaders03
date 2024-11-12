@@ -79,6 +79,7 @@ export class AuthService {
     return {
       ...tokens,
       userId: user._id,
+      "statusCode" : 200
     };
   }
 
@@ -99,6 +100,7 @@ export class AuthService {
     const newHashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = newHashedPassword;
     await user.save();
+    return user;
   }
 
   async forgotPassword(email: string) {
@@ -108,7 +110,7 @@ export class AuthService {
     if (user) {
       //If user exists, generate password reset link
       const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 1);
+      expiryDate.setDate(expiryDate.getDate() + 1);
 
       const resetToken = nanoid(64);
       await this.ResetTokenModel.create({
@@ -116,16 +118,20 @@ export class AuthService {
         userId: user._id,
         expiryDate,
       });
+
+      const code = Math.floor(100000 + Math.random() * 900000);
       //Send the link to the user by email
-      this.mailService.sendPasswordResetEmail(email, resetToken);
-      return resetToken;
+     await this.mailService.sendPasswordResetEmail(email, code);
+      return {"resetToken" : resetToken , "code" : code,
+      "statusCode": 200};
     }
 
     return { message: 'If this user exists, they will receive an email' };
   }
-  async mail(){
-    this.mailService.sendPasswordResetEmail("khaluiyesser@gmail.com", "hshshqs");
-  }
+
+  // async mail(){
+  //   this.mailService.sendPasswordResetEmail("khaluiyesser@gmail.com", "hshshqs");
+  // }
 
   async resetPassword(newPassword: string, resetToken: string) {
     //Find a valid reset token document
