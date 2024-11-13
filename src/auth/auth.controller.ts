@@ -7,6 +7,7 @@ import { ChangePasswordDto } from './dtos/change-password.dto';
 import { AuthenticationGuard } from 'src/guards/authentication.guard';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { SmsDto } from './dtos/Sms.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,11 @@ export class AuthController {
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @Post('send/sms')
+  async forgotPasswordOTP(@Body() sms: SmsDto) {
+    return this.authService.sms(sms.phoneNumber);
   }
 
   // @Post('yes')

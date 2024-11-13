@@ -18,6 +18,7 @@ import { nanoid } from 'nanoid';
 import { ResetToken } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
 import { RolesService } from 'src/roles/roles.service';
+import { TwilioService } from 'src/services/twilio.service';
 
 @Injectable()
 export class AuthService {
@@ -30,10 +31,11 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private rolesService: RolesService,
-  ) {}
+    private smsService: TwilioService,
+  ) { }
 
   async signup(signupData: SignupDto) {
-    const { email, password, name, lastname} = signupData;
+    const { email, password, name, lastname } = signupData;
 
     // Vérifier si l'email est déjà utilisé
     const emailInUse = await this.UserModel.findOne({ email });
@@ -79,7 +81,7 @@ export class AuthService {
     return {
       ...tokens,
       userId: user._id,
-      "statusCode" : 200
+      "statusCode": 200
     };
   }
 
@@ -121,13 +123,48 @@ export class AuthService {
 
       const code = Math.floor(100000 + Math.random() * 900000);
       //Send the link to the user by email
-     await this.mailService.sendPasswordResetEmail(email, code);
-      return {"resetToken" : resetToken , "code" : code,
-      "statusCode": 200};
+      await this.mailService.sendPasswordResetEmail(email, code);
+      return {
+        "resetToken": resetToken, "code": code,
+        "statusCode": 200
+      };
     }
 
     return { message: 'If this user exists, they will receive an email' };
   }
+
+
+  async sms(phoneNumber: string) {
+    //Check that user exists
+    //const user = await this.UserModel.findOne({  async forgotPassword(email: string) {
+    //Check that user exists
+    const user = await this.UserModel.findOne({ phoneNumber });
+
+    if (user) {
+
+      //If user exists, generate password reset link
+      /*const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + 1);
+
+      const resetToken = nanoid(64);
+      await this.ResetTokenModel.create({
+        token: resetToken,
+        userId: user._id,
+        expiryDate,
+      });*/
+      const code = Math.floor(100000 + Math.random() * 900000);
+      //Send the link to the user by email
+      this.smsService.sendSms(phoneNumber, code);
+      return;
+    }
+
+    return { message: 'If this user exists, they will receive an email' };
+  }
+
+
+
+
+
 
   // async mail(){
   //   this.mailService.sendPasswordResetEmail("khaluiyesser@gmail.com", "hshshqs");

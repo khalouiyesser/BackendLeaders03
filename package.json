@@ -46,6 +46,7 @@
     "nodemailer": "^6.9.13",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
+    "twilio": "^5.3.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
