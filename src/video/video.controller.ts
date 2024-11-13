@@ -3,14 +3,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInt
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
-// import { UploadFileService } from '../services/uploadFile.service';
+import { UploadFileService } from '../services/uploadFile.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('video')
 export class VideoController {
   constructor(
     private readonly videoService: VideoService,
-    // private readonly uploadFileService: UploadFileService
+    private readonly uploadFileService: UploadFileService
   ) {}
 
   @Post()
@@ -18,14 +18,15 @@ export class VideoController {
     return this.videoService.create(createVideoDto);
   }
 
-  // @Post('upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async upload(@UploadedFile() file: File) {
-  //   if (!file) {
-  //     throw new Error('No file uploaded');
-  //   }
-  //   return await this.uploadFileService.uploadVideo(file);
-  // }
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+    return await this.uploadFileService.uploadVideo(file);
+  }
+
 
   @Get()
   findAll() {

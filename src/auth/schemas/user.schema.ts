@@ -41,6 +41,9 @@ export class User extends Document {
 
   @Prop({ required: false,default:'' })
   website: string;
+  @Prop({ required: false,default:'' })
+  photoUrl: string;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

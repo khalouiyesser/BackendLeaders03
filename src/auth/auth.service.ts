@@ -104,7 +104,17 @@ export class AuthService {
     await user.save();
     return user;
   }
+  async getUser(id: string) {
+    //Check that user exists
+    // const user = await this.UserModel.findOne({ id });
+    const user = await this.UserModel.findById(id);
+    if (user) {
+      //If user exists, generate password reset link
+   return user;
+    }
 
+    return { message: 'nothing' };
+  }
   async forgotPassword(email: string) {
     //Check that user exists
     const user = await this.UserModel.findOne({ email });
@@ -136,7 +146,7 @@ export class AuthService {
 
   async sms(phoneNumber: string) {
     //Check that user exists
-    //const user = await this.UserModel.findOne({  async forgotPassword(email: string) {
+    // const user = await this.UserModel.findOne({  async forgotPassword(email: string) {
     //Check that user exists
     const user = await this.UserModel.findOne({ phoneNumber });
 
@@ -155,7 +165,7 @@ export class AuthService {
       const code = Math.floor(100000 + Math.random() * 900000);
       //Send the link to the user by email
       this.smsService.sendSms(phoneNumber, code);
-      return;
+      return {"number" :  phoneNumber ,"code": code, user};
     }
 
     return { message: 'If this user exists, they will receive an email' };

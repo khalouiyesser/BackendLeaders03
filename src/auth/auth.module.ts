@@ -10,6 +10,7 @@ import {
 import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
 import { RolesModule } from 'src/roles/roles.module';
+import { TwilioService } from '../services/twilio.service';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { RolesModule } from 'src/roles/roles.module';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, MailService],
+  providers: [AuthService, MailService,TwilioService],
   exports: [AuthService],
 })
+
 export class AuthModule {}

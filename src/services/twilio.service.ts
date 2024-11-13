@@ -15,7 +15,7 @@ export class TwilioService {
 
     async sendSms(to: string, message: number): Promise<any> {
         return this.twilioClient.messages.create({
-            body: String(message), // Convertir correctement le message en chaîne de caractères
+            body: "the otp code is "+String(message), // Convertir correctement le message en chaîne de caractères
             from: this.configService.get<string>('TWILIO_PHONE_NUMBER'), // Utiliser le numéro de téléphone Twilio
             to: to, // Numéro de destination
         });

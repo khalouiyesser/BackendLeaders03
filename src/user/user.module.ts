@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 // import { User } from './entities/user.entity';
 import { User, UserSchema } from '../auth/schemas/user.schema';
+import { UploadFileService } from '../services/uploadFile.service';
 // import { User, UserSchema } from './schemas/user.schema'; // Assurez-vous que le chemin est correct
 
 @Module({
@@ -16,6 +17,6 @@ import { User, UserSchema } from '../auth/schemas/user.schema';
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService,UploadFileService],
 })
 export class UserModule {}

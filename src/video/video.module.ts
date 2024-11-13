@@ -4,6 +4,7 @@ import { VideoController } from './video.controller';
 // import { UploadFileService } from './upload-file.service'; // Importez directement le service
 import { MongooseModule } from '@nestjs/mongoose';
 import { Video, VideoSchema } from './entities/video.entity';
+import { UploadFileService } from '../services/uploadFile.service';
 // import { UploadFileService } from '../services/uploadFile.service';
 // import { Video, VideoSchema } from './schemas/video.schema';
 
@@ -12,6 +13,6 @@ import { Video, VideoSchema } from './entities/video.entity';
     MongooseModule.forFeature([{ name: Video.name, schema: VideoSchema }]),
   ],
   controllers: [VideoController],
-  providers: [VideoService], // Ajoutez UploadFileService ici comme provider
+  providers: [VideoService,UploadFileService], // Ajoutez UploadFileService ici comme provider9
 })
 export class VideoModule {}

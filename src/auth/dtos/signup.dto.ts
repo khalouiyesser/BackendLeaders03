@@ -51,6 +51,12 @@ export class SignupDto {
   @IsString()
   score: string;
 
+  @IsOptional()
+  @IsString()
+  photoUrl: string;
+
+
+
 
 
 
