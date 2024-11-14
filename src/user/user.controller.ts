@@ -67,6 +67,23 @@ export class UserController {
       data: updatedUser,
     };
   }
-
+  // @Put(':id')
+  //
+  // async updateProfile(
+  //   @Param('id') id: string,
+  //   @Body() updateProfileDto: UpdateUserDto,
+  //
+  // ) {
+  //
+  //
+  //
+  //   // Appelle le service pour mettre à jour le profil dans la base de données
+  //   const updatedUser = await this.userService.updateUser(id, updateProfileDto);
+  //
+  //   return {
+  //     message: 'Profile updated successfully',
+  //     data: updatedUser,
+  //   };
+  // }
 
 }
