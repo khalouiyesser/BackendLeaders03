@@ -41,7 +41,6 @@ export class UploadFileService {
   async uploadVideo(file: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
       const buffer = file.buffer;
-
       cloudinary.uploader.upload_stream(
         { resource_type: 'video', folder: 'UploadLeaders', public_id: file.originalname.split('.')[0] },
         (error, result: UploadApiResponse) => {
@@ -51,5 +50,6 @@ export class UploadFileService {
       ).end(buffer);
     });
   }
+
 
 }
