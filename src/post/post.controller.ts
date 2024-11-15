@@ -4,8 +4,9 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../auth/schemas/user.schema';
 import { AuthenticationGuard } from '../guards/authentication.guard';
+import { ApiTags } from '@nestjs/swagger';
 // import { User } from '../user/entities/user.entity';
-
+@ApiTags('Post')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}

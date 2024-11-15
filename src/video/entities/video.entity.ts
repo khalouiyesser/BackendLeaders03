@@ -23,7 +23,7 @@ export class Video {
   @Prop({ required: true })
   url: string;
 
-  @Prop({ type: Types.ObjectId, ref: "Post", required: true })
+  @Prop({ type: Types.ObjectId, ref: "Post"})
   postId: Types.ObjectId;
 }
 

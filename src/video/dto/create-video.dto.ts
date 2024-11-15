@@ -1,4 +1,12 @@
+
+
 export class CreateVideoDto {
-  fileBase64: string; // Contient le fichier encodé en Base64
-  filename: string; // Nom du fichier (ex: "video.mp4")
+  title: string;         // Titre ou nom de la vidéo
+  description?: string;  // Description facultative
+  tags?: string[];       // Tags associés (facultatif)
+  // filename n'est plus nécessaire ici puisque nous allons l'obtenir à partir de Cloudinary
 }
+
+
+
+
