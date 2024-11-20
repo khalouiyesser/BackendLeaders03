@@ -16,5 +16,6 @@ import { TranscriptionService } from '../services/transcription.service';
   ],
   controllers: [VideoController],
   providers: [VideoService,UploadFileService,ChatGptService,TranscriptionService], // Ajoutez UploadFileService ici comme provider9
+  exports: [VideoService], // Assurez-vous que VideoService est exporté ici
 })
 export class VideoModule {}
