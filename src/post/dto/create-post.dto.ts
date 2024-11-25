@@ -10,10 +10,21 @@ export class CreatePostDto {
   @IsString()
   content: string; // Contenu du post
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
+  @IsOptional()
   user: Types.ObjectId; // ID de l'utilisateur qui a créé le post
 
   @IsOptional()
   @IsArray()
   videos?: Types.ObjectId[]; // Liste des IDs des vidéos associées au post (facultatif)
+
+  @IsOptional()
+  nbLikes: bigint;
+
+  @IsOptional()
+  @IsString()
+  type : string
+
+
+
 }

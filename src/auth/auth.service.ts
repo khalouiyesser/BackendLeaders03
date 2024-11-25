@@ -64,6 +64,7 @@ export class AuthService {
 
   async login(credentials: LoginDto) {
     const { email, password } = credentials;
+    // const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
     //Find if user exists by email
     const user = await this.UserModel.findOne({ email });
     if (!user) {
@@ -76,10 +77,19 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
 
+    const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
     //Generate JWT tokens
     const tokens = await this.generateUserTokens(user);
     return {
       ...tokens,
+      name,
+      lastname,
+      email,
+      domaine,
+      phoneNumber,
+      codePostal,
+      website,
+      photoUrl,
       userId: user._id,
       "statusCode": 200
     };

@@ -11,6 +11,7 @@ import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
 import { EducationModule } from './education/education.module';
 import config from './config/config';
+import {CommentaireModule} from "./commentaire/commentaire.module";
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import config from './config/config';
     PostModule,
     UserModule,
     EducationModule,
+    CommentaireModule,
   ],
   controllers: [AppController], // PostController n'est plus nécessaire ici
   providers: [AppService], // PostService n'est plus nécessaire ici

@@ -59,7 +59,7 @@ export class UserController {
     // Upload la photo si elle est présente
     // Upload la photo si elle est présente
     if (photo) {
-      const photoUrl = await this.uploadFileService.uploadVideo(photo);
+      const photoUrl = await this.uploadFileService.uploadImageA(photo);
       updateProfileDto.photoUrl = photoUrl;
     }
 

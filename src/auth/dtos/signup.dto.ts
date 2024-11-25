@@ -33,11 +33,11 @@ export class SignupDto {
   website: string;
 
   @IsString()
-  @Length(6)
+  @Length(4)
   @IsOptional()
   codePostal: string;
 
-
+  @ApiProperty({ example: 'IT', description: 'Informaticien' })
   @IsOptional()
   @IsString()
   domaine: string;
@@ -66,7 +66,9 @@ export class SignupDto {
   photoUrl: string;
 
 
-
+  @IsOptional()
+  @IsString()
+  Bio : string
 
 
 

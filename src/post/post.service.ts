@@ -7,6 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../auth/schemas/user.schema';
 import {JwtService} from "@nestjs/jwt";
 import {VideoService} from "../video/video.service";
+import {RefreshToken} from "../auth/schemas/refresh-token.schema";
+import {Video} from "../video/entities/video.entity";
 // import { User } from '../user/entities/user.entity';
 
 @Injectable()
@@ -72,6 +74,51 @@ export class PostService {
     } catch (error) {
       throw new Error(`Erreur lors de la création du post avec vidéo : ${error.message}`);
     }
+  }
+
+
+  // async findByUser(id: string): Promise<Post[]> {
+  //   const posts = await this.postModel.find({ user: id }).exec();
+  //
+  //   for (const post of posts) {
+  //     // Accéder au premier élément du tableau "videos"
+  //     const videoId = post.videos[0];
+  //     const video  = this.videoService.findOne(videoId.toString())
+  //
+  //     const url = video.url
+  //   }
+  //
+  //   return posts; // Assurez-vous que cette ligne retourne bien un tableau de posts
+  // }
+
+
+  async findByUser(id: string): Promise<Post[]> {
+    // Trouver tous les posts associés à l'utilisateur
+    const posts = await this.postModel.find({ user: id }).exec();
+
+    // Parcourir chaque post pour ajouter le champ `videoUrl`
+    for (const post of posts) {
+      // Vérifier si des vidéos sont associées
+      if (post.videos && post.videos.length > 0) {
+        // Accéder au premier ID de la vidéo
+        const videoId = post.videos[0];
+
+        // Récupérer les détails de la vidéo (par exemple son URL)
+        const video = await this.videoService.findOne(videoId.toString());
+
+        // Ajouter l'URL de la vidéo au champ `videoUrl` du post
+        if (video) {
+          (post as any).videoUrl = video.url; // Ajout du champ `videoUrl` dynamiquement
+        } else {
+          (post as any).videoUrl = null; // Si la vidéo n'existe pas, définir à `null`
+        }
+      } else {
+        // Si aucune vidéo n'est associée, définir `videoUrl` à `null`
+        (post as any).videoUrl = null;
+      }
+    }
+
+    return posts; // Retourner les posts avec le champ `videoUrl` ajouté
   }
 
 

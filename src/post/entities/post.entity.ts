@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Post {
+
   @Prop({ required: true })
   title: string; // Titre du post
 
@@ -16,6 +17,16 @@ export class Post {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Video' }] })
   videos: Types.ObjectId[]; // Référence aux vidéos associées à ce post
+
+  @Prop({ default: 'hiring' })
+  type: string;
+
+  @Prop()
+  videoUrl: string;
+
+
+
+
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

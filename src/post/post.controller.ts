@@ -8,7 +8,7 @@ import {
   Delete,
   UseGuards,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors, NotFoundException
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -40,6 +40,18 @@ export class PostController {
     // Appeler le service pour créer un post avec vidéo
     return await this.postService.createWithVideo(file, createPostDto);
   }
+
+
+
+  @Get(':id') // Utilisez ':' pour spécifier une variable dans l'URL
+  async findByUser(@Param('id') id: string) {
+    const posts = await this.postService.findByUser(id);
+    if (!posts || posts.length === 0) {
+      throw new NotFoundException(`Aucun post trouvé pour l'utilisateur avec l'ID ${id}`);
+    }
+    return posts;
+  }
+
 
   @Get()
   findAll() {
