@@ -1,20 +1,19 @@
-import {Prop, SchemaFactory} from "@nestjs/mongoose";
-import {Types} from "mongoose";
 
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import {Post} from "../../post/entities/post.entity";
+import {User} from "../../auth/schemas/user.schema";
 
-export class Commentaire {
+@Schema()
+export class Commentaire extends Document {
+    @Prop({ required: true, type: Object })  // Référence à la collection User
+    user: User;
 
+    @Prop({ required: true })
+    Contenu: string;
 
-
-    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    user: Types.ObjectId; // Référence à l'utilisateur qui a créé ce post
-
-    @Prop()
-    Contenu : string;
-
-    @Prop({ type: Types.ObjectId, ref: 'PostF', required: true })
-    post: Types.ObjectId;
-
+    @Prop({ required: true, type: Object }) // Référence à la collection Post
+    post: Post;
 }
 
 export const CommentaireSchema = SchemaFactory.createForClass(Commentaire);

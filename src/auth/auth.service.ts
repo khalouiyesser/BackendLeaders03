@@ -37,8 +37,10 @@ export class AuthService {
   async signup(signupData: SignupDto) {
     const { email, password, name, lastname } = signupData;
 
+
+    const lowerCaseEmail = email.toLowerCase();
     // Vérifier si l'email est déjà utilisé
-    const emailInUse = await this.UserModel.findOne({ email });
+    const emailInUse = await this.UserModel.findOne({ lowerCaseEmail });
     if (emailInUse) {
       throw new BadRequestException('Email already in use');
     }
@@ -49,7 +51,7 @@ export class AuthService {
     // Créer l'utilisateur avec toutes les informations
     const user = new this.UserModel({
       name,
-      email,
+      lowerCaseEmail,
       password: hashedPassword,
       lastname,
     });
@@ -66,6 +68,8 @@ export class AuthService {
     const { email, password } = credentials;
     // const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
     //Find if user exists by email
+
+    // const
     const user = await this.UserModel.findOne({ email });
     if (!user) {
       throw new UnauthorizedException('Wrong credentials');
@@ -74,7 +78,7 @@ export class AuthService {
     //Compare entered password with existing password
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Wrong credentials');
+      throw new UnauthorizedException('Wrong ');
     }
 
     const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;

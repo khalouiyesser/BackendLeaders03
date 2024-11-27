@@ -5,11 +5,7 @@ import {UserModule} from "../user/user.module";
 import {PostModule} from "../post/post.module";
 import {CommentaireController} from "./commentaire.controller";
 import {CommentaireService} from "./commentaire.service";
-// import { CommentaireService } from './commentaire.service';
-// import { CommentaireController } from './commentaire.controller';
-// import { Commentaire, CommentaireSchema } from './entities/commentaire.entity';
-// import { UserModule } from '../user/user.module';
-// import { PostModule } from '../post/post.module';
+
 
 @Module({
   imports: [
@@ -21,6 +17,7 @@ import {CommentaireService} from "./commentaire.service";
   ],
   controllers: [CommentaireController],
   providers: [CommentaireService],
+
 })
 export class CommentaireModule {}
 

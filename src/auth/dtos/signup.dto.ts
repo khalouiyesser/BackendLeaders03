@@ -70,10 +70,4 @@ export class SignupDto {
   @IsString()
   Bio : string
 
-
-
-
-
-
-
 }

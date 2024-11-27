@@ -1,5 +1,7 @@
-import { IsNotEmpty, IsString, IsArray, IsOptional } from 'class-validator';
+import {IsNotEmpty, IsString, IsArray, IsOptional} from 'class-validator';
 import { Types } from 'mongoose';
+import {Commentaire} from "../../commentaire/entities/commentaire.entity";
+import {User} from "../../auth/schemas/user.schema";
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -12,18 +14,24 @@ export class CreatePostDto {
 
   // @IsNotEmpty()
   @IsOptional()
-  user: Types.ObjectId; // ID de l'utilisateur qui a créé le post
+  user: object; // ID de l'utilisateur qui a créé le post
 
   @IsOptional()
   @IsArray()
   videos?: Types.ObjectId[]; // Liste des IDs des vidéos associées au post (facultatif)
 
   @IsOptional()
-  nbLikes: bigint;
+  nbLikes: number;
 
   @IsOptional()
   @IsString()
   type : string
+
+  @IsNotEmpty()
+  @IsOptional()
+  commentaires: Commentaire[]; // Tableau d'objets Post
+
+
 
 
 

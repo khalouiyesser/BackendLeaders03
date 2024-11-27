@@ -59,6 +59,9 @@ import { ConfigService } from '@nestjs/config';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import * as multer from 'multer';
 import * as buffer from 'node:buffer';
+import {extname} from "path";
+import {diskStorage} from "multer";
+import * as path from "node:path";
 
 @Injectable()
 export class UploadFileService {
@@ -120,5 +123,21 @@ export class UploadFileService {
       ).end(buffer);
     });
   }
+
+  async uploadLocal(file: Express.Multer.File) {
+    const storage = multer.diskStorage({
+      destination: './uploads',  // Dossier où les fichiers seront enregistrés
+      filename: (req, file, callback) => {
+        // Personnalisation du nom du fichier pour éviter les doublons
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        callback(null, `${file.fieldname}-${uniqueSuffix}${extension}`);
+      }
+    });
+
+    // Return or use the storage configuration as needed
+    return storage;
+  }
+
 
 }

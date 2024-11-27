@@ -6,15 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   UploadedFile,
   UseInterceptors, NotFoundException
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { User } from '../auth/schemas/user.schema';
-import { AuthenticationGuard } from '../guards/authentication.guard';
+
 import { ApiTags } from '@nestjs/swagger';
 import {FileInterceptor} from "@nestjs/platform-express";
 // import { User } from '../user/entities/user.entity';
@@ -31,6 +29,8 @@ export class PostController {
   //   return this.postService.create(createPostDto);  // Utilise l'ID de l'utilisateur pour créer le post
   // }
 
+
+
   @Post()
   @UseInterceptors(FileInterceptor('file')) // Gérer l'upload de fichier
   async create(
@@ -39,11 +39,22 @@ export class PostController {
   ) {
     // Appeler le service pour créer un post avec vidéo
     return await this.postService.createWithVideo(file, createPostDto);
+
+  }
+  @Post("android")
+  @UseInterceptors(FileInterceptor('file')) // Gérer l'upload de fichier
+  async PostAndroid(
+      @UploadedFile() file: Express.Multer.File,
+      @Body() createPostDto: CreatePostDto
+  ) {
+    // Appeler le service pour créer un post avec vidéo
+    return await this.postService.createWithVideo(file, createPostDto);
+
   }
 
 
 
-  @Get(':id') // Utilisez ':' pour spécifier une variable dans l'URL
+  @Get('user/:id') // Utilisez ':' pour spécifier une variable dans l'URL
   async findByUser(@Param('id') id: string) {
     const posts = await this.postService.findByUser(id);
     if (!posts || posts.length === 0) {
@@ -60,16 +71,29 @@ export class PostController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+    return this.postService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+    return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+    return this.postService.remove(id);
   }
+
+  // Route pour liker un post
+  @Patch(':id/like')
+  async like(@Param('id') id: string){
+    return this.postService.like(id);
+  }
+
+  // Route pour disliker un post
+  @Patch(':id/dislike')
+  async dislike(@Param('id') id: string) {
+    return this.postService.dislike(id);
+  }
+
 }

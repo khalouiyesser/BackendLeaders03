@@ -57,5 +57,6 @@ import { VideoModule } from '../video/video.module';  // Ajoutez cette ligne pou
     UserModule,
     VideoModule,  // Ajoutez VideoModule ici
   ],
+  exports: [MongooseModule],
 })
 export class PostModule {}

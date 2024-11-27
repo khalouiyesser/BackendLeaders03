@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, SchemaTypes, Types } from 'mongoose';
+import {Commentaire} from "../../commentaire/entities/commentaire.entity";
+import {Post} from "../../post/entities/post.entity";
 
 @Schema({ timestamps: true })
 export class User extends Document {
@@ -27,8 +29,8 @@ export class User extends Document {
   @Prop({ required: false ,default:'' })
   cv: string;
 
-  @Prop({ type: [SchemaTypes.ObjectId], ref: 'Post', required: false })
-  posts: Types.ObjectId[];
+  @Prop({ type: [{ type: Object }] }) // Tableau d'objets complets
+  posts: Post[];
 
   @Prop({ type:[SchemaTypes.ObjectId],ref : 'Education', required: false })
   educations: Types.ObjectId[];
@@ -41,6 +43,8 @@ export class User extends Document {
 
   @Prop({ required: false,default:'' })
   website: string;
+
+
   @Prop({ required: false,default:'' })
   photoUrl: string;
 
