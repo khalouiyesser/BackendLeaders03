@@ -24,6 +24,7 @@ export class SignupDto {
   @IsString()
   @MinLength(6)
   @Matches(/^(?=.*[0-9])/, { message: 'Password must contain at least one number' })
+  @IsOptional()
   password: string;
 
 
@@ -69,5 +70,10 @@ export class SignupDto {
   @IsOptional()
   @IsString()
   Bio : string
+
+
+  @IsOptional()
+  @IsString()
+  postId: string
 
 }

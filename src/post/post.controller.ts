@@ -57,8 +57,10 @@ export class PostController {
   @Get('user/:id') // Utilisez ':' pour spécifier une variable dans l'URL
   async findByUser(@Param('id') id: string) {
     const posts = await this.postService.findByUser(id);
+
     if (!posts || posts.length === 0) {
-      throw new NotFoundException(`Aucun post trouvé pour l'utilisateur avec l'ID ${id}`);
+      // throw new NotFoundException(`Aucun post trouvé pour l'utilisateur avec l'ID ${id}`);
+      return id;
     }
     return posts;
   }

@@ -81,7 +81,7 @@ export class AuthService {
       throw new UnauthorizedException('Wrong ');
     }
 
-    const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
+    const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl,posts  } = user;
     //Generate JWT tokens
     const tokens = await this.generateUserTokens(user);
     return {
@@ -95,6 +95,7 @@ export class AuthService {
       website,
       photoUrl,
       userId: user._id,
+      posts : posts,
       "statusCode": 200
     };
   }

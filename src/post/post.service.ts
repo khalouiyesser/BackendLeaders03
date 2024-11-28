@@ -96,12 +96,10 @@ export class PostService {
     }
   }
 
-  async findByUser(id: string): Promise<Post[]> {
-    // Convertir l'ID en ObjectId si nécessaire
-    const userId = new Types.ObjectId(id);
 
+  async findByUser(id: string): Promise<Post[]> {
     // Trouver tous les posts associés à l'utilisateur
-    const posts = await this.postModel.find({ user: userId }).exec();
+    const posts = await this.postModel.find({ user: id }).exec();
 
     // Parcourir chaque post pour ajouter le champ `videoUrl`
     for (const post of posts) {

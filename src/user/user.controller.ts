@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Put } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+// import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UploadFileService } from '../services/uploadFile.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
+import {PostService} from "../post/post.service";
 
 
 
@@ -12,7 +13,8 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService,
-              private readonly uploadFileService: UploadFileService) {}
+              private readonly uploadFileService: UploadFileService,
+  ) {}
   // constructor(private readonly uploadFileService: UploadFileService) {}
 
   // @Post()
@@ -48,6 +50,12 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
+  @Put('/savePost/:id')
+  async savedPost(@Param('id') userId: string, @Body('postId') postId: string) {
+    return this.userService.savePost(userId, postId);
+  }
+
+
 
   @Put(':id')
   @UseInterceptors(FileInterceptor('photoUrl'))
@@ -65,10 +73,25 @@ export class UserController {
 
     // Appelle le service pour mettre à jour le profil dans la base de données
     const updatedUser = await this.userService.updateUser(id, updateProfileDto);
-
+    console.log(updatedUser)
     return {
-      message: 'Profile updated successfully',
-      data: updatedUser,
+      // message: 'Profile updated successfully',
+      // data: updatedUser,
+
+      // user: {
+
+
+        posts: updatedUser.posts,
+        id: updatedUser.id,
+        // name: updatedUser.name,
+        // lastname: updatedUser.lastname,
+        // email: updatedUser.email,
+        // phoneNumber: updatedUser.phoneNumber,
+        // domaine: updatedUser.domaine,
+        photoUrl: updatedUser.photoUrl,
+        // bio: updatedUser.bio,
+        // updatedAt: updatedUser.updatedAt,
+      // },
     };
   }
   // @Put(':id')

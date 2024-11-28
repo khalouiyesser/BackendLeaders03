@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 // import { User } from './entities/user.entity';
 import { User, UserSchema } from '../auth/schemas/user.schema';
 import { UploadFileService } from '../services/uploadFile.service';
+import {Post} from "../post/entities/post.entity";
 // import { User, UserSchema } from './schemas/user.schema'; // Assurez-vous que le chemin est correct
 
 @Module({
@@ -12,6 +13,12 @@ import { UploadFileService } from '../services/uploadFile.service';
     MongooseModule.forFeature([
       {
         name: User.name,
+        schema: UserSchema,
+      },
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: Post.name,
         schema: UserSchema,
       },
     ]),
