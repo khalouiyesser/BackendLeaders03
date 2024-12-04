@@ -15,11 +15,13 @@ import { UpdatePostDto } from './dto/update-post.dto';
 
 import { ApiTags } from '@nestjs/swagger';
 import {FileInterceptor} from "@nestjs/platform-express";
+import {ClaudeApi} from "../services/Claude.service";
 // import { User } from '../user/entities/user.entity';
 @ApiTags('Post')
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService,
+              private readonly claudeService: ClaudeApi) {}
   // constructor(private readonly postService: PostService) {}
 
   // @Post()
@@ -51,8 +53,36 @@ export class PostController {
     return await this.postService.createWithVideo(file, createPostDto);
 
   }
+  @Post("claude/:description")
+  async generateQuestions(@Param('description') description: string) {
+    try {
+      // Générer les questions
+      const questions = await this.claudeService.generateQuestions(description);
 
+      // Extraction des variables individuelles
+      const question1 = questions.question1;
+      const question2 = questions.question2;
+      const question3 = questions.question3;
+      const question4 = questions.question4;
+      const question5 = questions.question5;
 
+      // Retourner un objet avec les questions individuelles
+      return {
+        question1,
+        question2,
+        question3,
+        question4,
+        question5,
+        // Vous pouvez également retourner l'objet complet si nécessaire
+        // allQuestions: questions
+      };
+    } catch (error) {
+      return {
+        error: true,
+        message: error.message
+      };
+    }
+  }
 
   @Get('user/:id') // Utilisez ':' pour spécifier une variable dans l'URL
   async findByUser(@Param('id') id: string) {

@@ -36,11 +36,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Post, PostSchema } from './entities/post.entity';
 import { UserModule } from '../user/user.module';
 import { User, UserSchema } from '../auth/schemas/user.schema';
-import { VideoModule } from '../video/video.module';  // Ajoutez cette ligne pour importer VideoModule
+import { VideoModule } from '../video/video.module';
+import {ClaudeApi} from "../services/Claude.service";  // Ajoutez cette ligne pour importer VideoModule
 
 @Module({
   controllers: [PostController],
-  providers: [PostService],
+  providers: [PostService,ClaudeApi],
   imports: [
     MongooseModule.forFeature([
       {
