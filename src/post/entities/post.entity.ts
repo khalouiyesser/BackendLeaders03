@@ -36,7 +36,10 @@ export class Post {
   @Prop({ required: false, type: Object }) // Référence à la collection Post
   user: User;
 
-
+  @Prop()
+  userName: string;
+  @Prop()
+  photoUrl: string;
 
 
 }

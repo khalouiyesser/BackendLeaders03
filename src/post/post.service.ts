@@ -115,11 +115,53 @@ export class PostService {
 
     return posts;
   }
+  async findAll(): Promise<any[]> {
+    // Récupération des posts avec les vidéos associées
+    const posts = await this.postModel.find().exec();
 
-  async findAll(): Promise<Post[]> {
-    // Trouver tous les posts
-    return this.postModel.find().exec();
+    for (const post of posts) {
+      // Vérification si un utilisateur est associé au post
+      if (post.user) {
+        // Recherche de l'utilisateur par ID
+        const user = await this.userModel.findById(post.user).exec();
+        if (user) {
+          // Construction du champ userName
+          const userName = `${user.name || ''} ${user.lastname || ''}`.trim();
+          const photoUrl = user.photoUrl || '';
+
+          // Ajout des informations utilisateur au post
+          (post as any).userName = userName;
+          (post as any).photoUrl = photoUrl;
+        } else {
+          // Utilisateur introuvable
+          (post as any).userName = null;
+          (post as any).photoUrl = null;
+        }
+      } else {
+        // Aucun utilisateur associé au post
+        (post as any).userName = null;
+        (post as any).photoUrl = null;
+      }
+
+      // Gestion des vidéos associées
+      if (post.videos && post.videos.length > 0) {
+        // Si plusieurs vidéos sont associées, prendre la première pour l'exemple
+        const video = await this.videoService.findOne(post.videos[0].toString());
+        (post as any).videoUrl = video ? video.url : null;
+      } else {
+        (post as any).videoUrl = null;
+      }
+    }
+
+    // Transformation en objets simples pour éviter les références circulaires
+    return posts.map(post => ({
+      ...post.toObject(),
+      userName: (post as any).userName, // Champ supplémentaire
+      photoUrl: (post as any).photoUrl, // Champ supplémentaire
+      videoUrl: (post as any).videoUrl, // Champ supplémentaire
+    }));
   }
+
 
   async findOne(id: string): Promise<Post | null> {
     // Convertir l'ID en ObjectId si nécessaire

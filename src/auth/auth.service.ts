@@ -34,13 +34,79 @@ export class AuthService {
     private smsService: TwilioService,
   ) { }
 
+  // async signup(signupData: SignupDto) {
+  //   const { email, password, name, lastname } = signupData;
+  //
+  //
+  //   const lowerCaseEmail = email.toLowerCase();
+  //   // Vérifier si l'email est déjà utilisé
+  //   const emailInUse = await this.UserModel.findOne({ lowerCaseEmail });
+  //   if (emailInUse) {
+  //     throw new BadRequestException('Email already in use');
+  //   }
+  //
+  //   // Hacher le mot de passe
+  //   const hashedPassword = await bcrypt.hash(password, 10);
+  //
+  //   // Créer l'utilisateur avec toutes les informations
+  //   const user = new this.UserModel({
+  //     name,
+  //     lowerCaseEmail,
+  //     password: hashedPassword,
+  //     lastname,
+  //   });
+  //
+  //   // Sauvegarder l'utilisateur dans MongoDB
+  //   await user.save();
+  //
+  //   // Retourner l'utilisateur avec toutes les informations, sans le mot de passe
+  //   return await this.UserModel.findById(user._id).select('-password').lean();
+  // }
+  //
+  //
+  // async login(credentials: LoginDto) {
+  //   const { email, password } = credentials;
+  //   // const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
+  //   //Find if user exists by email
+  //
+  //   // const
+  //   const user = await this.UserModel.findOne({ email });
+  //   if (!user) {
+  //     throw new UnauthorizedException('Wrong credentials');
+  //   }
+  //
+  //   //Compare entered password with existing password
+  //   const passwordMatch = await bcrypt.compare(password, user.password);
+  //   if (!passwordMatch) {
+  //     throw new UnauthorizedException('Wrong ');
+  //   }
+  //
+  //   const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl,posts  } = user;
+  //   //Generate JWT tokens
+  //   const tokens = await this.generateUserTokens(user);
+  //   return {
+  //     ...tokens,
+  //     name,
+  //     lastname,
+  //     email,
+  //     domaine,
+  //     phoneNumber,
+  //     codePostal,
+  //     website,
+  //     photoUrl,
+  //     userId: user._id,
+  //     posts : posts,
+  //     "statusCode": 200
+  //   };
+  // }
   async signup(signupData: SignupDto) {
     const { email, password, name, lastname } = signupData;
 
+    // Convertir l'email en minuscules
+    const emailLowerCase = email.toLowerCase();
 
-    const lowerCaseEmail = email.toLowerCase();
     // Vérifier si l'email est déjà utilisé
-    const emailInUse = await this.UserModel.findOne({ lowerCaseEmail });
+    const emailInUse = await this.UserModel.findOne({ email: emailLowerCase });
     if (emailInUse) {
       throw new BadRequestException('Email already in use');
     }
@@ -48,10 +114,10 @@ export class AuthService {
     // Hacher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Créer l'utilisateur avec toutes les informations
+    // Créer l'utilisateur avec toutes les informations, l'email est déjà en minuscules
     const user = new this.UserModel({
       name,
-      lowerCaseEmail,
+      email: emailLowerCase,  // Enregistrer l'email en minuscule
       password: hashedPassword,
       lastname,
     });
@@ -63,40 +129,43 @@ export class AuthService {
     return await this.UserModel.findById(user._id).select('-password').lean();
   }
 
-
   async login(credentials: LoginDto) {
     const { email, password } = credentials;
-    // const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl  } = user;
-    //Find if user exists by email
 
-    // const
-    const user = await this.UserModel.findOne({ email });
+    // Convertir l'email en minuscules
+    const emailLowerCase = email.toLowerCase();
+
+    // Trouver l'utilisateur avec l'email en minuscule
+    const user = await this.UserModel.findOne({ email: emailLowerCase });
     if (!user) {
       throw new UnauthorizedException('Wrong credentials');
     }
 
-    //Compare entered password with existing password
+    // Comparer le mot de passe
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Wrong ');
+      throw new UnauthorizedException('Wrong credentials');
     }
 
-    const {name , lastname,phoneNumber,codePostal,website,domaine,photoUrl,posts  } = user;
-    //Generate JWT tokens
+    const { name, lastname, phoneNumber, codePostal, website, domaine, photoUrl, posts, Role } = user;
+
+    // Générer les tokens JWT
     const tokens = await this.generateUserTokens(user);
+
     return {
       ...tokens,
       name,
       lastname,
-      email,
+      email: emailLowerCase,  // Retourner l'email en minuscule
       domaine,
       phoneNumber,
       codePostal,
       website,
       photoUrl,
       userId: user._id,
-      posts : posts,
-      "statusCode": 200
+      posts,
+      Role,
+      statusCode: 200
     };
   }
 
