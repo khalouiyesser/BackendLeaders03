@@ -20,14 +20,16 @@ export class ClaudeApi {
                     messages: [
                         {
                             role: 'user',
-                            content: `Génère un objet JSON avec 5 questions techniques spécifiques à cette description : ${description}. 
+                            content: `Génère un objet JSON avec 10 questions techniques spécifiques à cette description : ${description}. 
                             Format exact : 
                             {
                                 "question1": "Texte de la première question",
                                 "question2": "Texte de la deuxième question",
                                 "question3": "Texte de la troisième question",
                                 "question4": "Texte de la quatrième question",
-                                "question5": "Texte de la cinquième question"
+                                .
+                                .
+                                "question10": "Texte de la cinquième question"
                             }
                             Les questions doivent être techniques, détaillées et directement liées au contexte de la description.`
                         }

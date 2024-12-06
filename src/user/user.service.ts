@@ -54,12 +54,12 @@ export class UserService {
     // Ajouter l'objet complet du post au champ savedPost
     user.savedPost.push(fullPost);
 
+    console.log(user)
     // Sauvegarder l'utilisateur avec la mise à jour
     await user.save();
 
     // Retourner l'utilisateur mis à jour (ou une partie spécifique si nécessaire)
-    return user;
+    return "user";
   }
-
 
 }

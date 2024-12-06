@@ -161,6 +161,88 @@ export class PostService {
       videoUrl: (post as any).videoUrl, // Champ supplémentaire
     }));
   }
+  async SavedPost(idUser: string): Promise<any[]> {
+    // Récupération de l'utilisateur avec ses posts
+    const user = await this.userModel.findById(idUser).populate('savedPost').exec();
+    if (!user || !user.savedPost) {
+      throw new Error("Utilisateur introuvable ou aucun post sauvegardé");
+    }
+
+    const posts = user.savedPost; // `savedPost` est déjà peuplé avec `populate`
+
+    // Utilisation de Promise.all pour enrichir les posts
+    const enrichedPosts = await Promise.all(
+        posts.map(async (post: any) => {
+          const enrichedPost: any = { ...post }; // Clonage de l'objet, pas besoin de `toObject`
+
+          // Gestion des informations utilisateur associées
+          if (post.user) {
+            const postUser = await this.userModel.findById(post.user).exec();
+            if (postUser) {
+              enrichedPost.userName = `${postUser.name || ''} ${postUser.lastname || ''}`.trim();
+              enrichedPost.photoUrl = postUser.photoUrl || '';
+            } else {
+              enrichedPost.userName = null;
+              enrichedPost.photoUrl = null;
+            }
+          } else {
+            enrichedPost.userName = null;
+            enrichedPost.photoUrl = null;
+          }
+
+          // Gestion des vidéos associées
+          if (post.videos && post.videos.length > 0) {
+            const video = await this.videoService.findOne(post.videos[0].toString());
+            enrichedPost.videoUrl = video ? video.url : null;
+          } else {
+            enrichedPost.videoUrl = null;
+          }
+
+          return enrichedPost;
+        })
+    );
+
+    console.log("yyyyyyy" + enrichedPosts.length)
+    return enrichedPosts;
+  }
+
+  async removeSavedPost(userId: string, postId: string): Promise<void> {
+    // Récupérer l'utilisateur avec ses posts sauvegardés
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new Error("Utilisateur introuvable");
+    }
+
+    // Vérifier si le post existe dans les sauvegardes
+    const savedPostIndex = user.savedPost.findIndex(
+        (post: any) => post._id.toString() === postId
+    );
+
+    if (savedPostIndex === -1) {
+      throw new Error("Post non trouvé dans les sauvegardes");
+    }
+
+    // Supprimer le post de la liste `savedPost`
+    user.savedPost.splice(savedPostIndex, 1);
+
+    // Sauvegarder les modifications
+    await user.save();
+  }
+
+  async removeAllSavedPosts(userId: string): Promise<void> {
+    // Récupérer l'utilisateur par son ID
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new Error("Utilisateur introuvable");
+    }
+
+    // Vider le tableau `savedPost`
+    user.savedPost = [];
+
+    // Sauvegarder les modifications
+    await user.save();
+  }
+
 
 
   async findOne(id: string): Promise<Post | null> {
@@ -181,11 +263,13 @@ export class PostService {
     return this.postModel.findByIdAndDelete(id).exec();
   }
   async like(id: string): Promise<Post | null> {
+    console.log("aaaaaa")
     // Incrémenter nbLikes de +1
     return this.postModel.findByIdAndUpdate(
         id,
         { $inc: { nbLikes: 1 } }, // $inc incrémente la valeur de nbLikes
         { new: true } // Retourner le post mis à jour
+
     ).exec();
   }
 

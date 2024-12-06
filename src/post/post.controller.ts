@@ -16,12 +16,14 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiTags } from '@nestjs/swagger';
 import {FileInterceptor} from "@nestjs/platform-express";
 import {ClaudeApi} from "../services/Claude.service";
+import {UserService} from "../user/user.service";
 // import { User } from '../user/entities/user.entity';
 @ApiTags('Post')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService,
-              private readonly claudeService: ClaudeApi) {}
+              private readonly claudeService: ClaudeApi,
+              private readonly userService: UserService) {}
   // constructor(private readonly postService: PostService) {}
 
   // @Post()
@@ -57,6 +59,7 @@ export class PostController {
   async generateQuestions(@Param('description') description: string) {
     try {
       // Générer les questions
+      console.log("claude1")
       const questions = await this.claudeService.generateQuestions(description);
 
       // Extraction des variables individuelles
@@ -65,7 +68,11 @@ export class PostController {
       const question3 = questions.question3;
       const question4 = questions.question4;
       const question5 = questions.question5;
-
+      const question6 = questions.question6;
+      const question7 = questions.question7;
+      const question8 = questions.question8;
+      const question9 = questions.question9;
+      const question10 = questions.question10;
       // Retourner un objet avec les questions individuelles
       return {
         question1,
@@ -73,6 +80,11 @@ export class PostController {
         question3,
         question4,
         question5,
+        question6,
+        question7,
+        question8,
+        question9,
+        question10,
         // Vous pouvez également retourner l'objet complet si nécessaire
         // allQuestions: questions
       };
@@ -92,15 +104,33 @@ export class PostController {
       // throw new NotFoundException(`Aucun post trouvé pour l'utilisateur avec l'ID ${id}`);
       return id;
     }
+    console.log(posts.length)
+
     return posts;
   }
 
-
+  //
+  // @Post('saved/:idPost/:idUser')
+  // async savePost(@Param('id') idPost: string,@Param('idUser') idUser: string) {
+  //   const post = this.postService.findOne(idPost);
+  //   const user = this.userService.findOne(idUser);
+  //   if (!user){
+  //     throw new NotFoundException();
+  //   }
+  //   if (!post) {
+  //     throw new NotFoundException();
+  //   }
+  //
+  // }
   @Get()
   findAll() {
     return this.postService.findAll();
   }
 
+  @Get('savedPosts/:id')
+  findSavedPost(@Param('id') id: string)  {
+    return this.postService.SavedPost(id);
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);
@@ -116,6 +146,14 @@ export class PostController {
     return this.postService.remove(id);
   }
 
+  @Delete('romovePosts/:id')
+  removeAllSavedPosts(@Param('id') id: string) {
+    return this.postService.removeAllSavedPosts(id);
+  }
+  @Delete('deleteOne/:idUser/:idPost')
+  removeOneSavedPost(@Param('idUser') idU: string,@Param('idPost') idP: string) {
+    return this.postService.removeSavedPost(idU,idP);
+  }
   // Route pour liker un post
   @Patch(':id/like')
   async like(@Param('id') id: string){

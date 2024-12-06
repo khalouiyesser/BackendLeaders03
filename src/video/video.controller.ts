@@ -76,62 +76,10 @@ export class VideoController {
     const questions = await this.chatGptService.generateQuestionsForOffer(offer);
     return questions;
   }
-
-  // @Post('analyze')
-  // @UseInterceptors(
-  //   FileInterceptor('file', {
-  //     dest: './uploads',
-  //     fileFilter: (req, file, callback) => {
-  //       // Vérifier le type MIME du fichier
-  //       if (!file.mimetype.includes('audio/')) {
-  //         return callback(new Error('Only audio files are allowed!'), false);
-  //       }
-  //       callback(null, true);
-  //     },
-  //     limits: {
-  //       fileSize: 1024 * 1024 * 10, // Limite à 10MB par exemple
-  //     },
-  //   })
-  // )
-  //
-  // async analyzeVideo(@UploadedFile() file: Express.Multer.File) {
-  //   try {
-  //     if (!file) {
-  //       throw new Error('No audio file uploaded');
-  //     }
-  //
-  //     console.log('File information:', {
-  //       originalname: file.originalname,
-  //       path: file.path,
-  //       mimetype: file.mimetype,
-  //       size: file.size
-  //     });
-  //
-  //     // Étape 1 : Transcrire l'audio
-  //     const transcription = await this.transcriptionService.transcribeVideo(file.path);
-  //
-  //     // Si la transcription est vide, arrêter le processus
-  //     if (!transcription) {
-  //       throw new Error('No transcription generated');
-  //     }
-  //
-  //     // Étape 2 : Envoyer la transcription à ChatGPT
-  //     const prompt = `Voici une transcription d'une vidéo : "${transcription}". Peux-tu résumer le sujet de cette vidéo en quelques mots ?`;
-  //     const response = await this.chatGptService.sendMessageToApi(prompt);
-  //
-  //     return {
-  //       success: true,
-  //       transcription,
-  //       sujet: response
-  //     };
-  //
-  //   } catch (error) {
-  //     console.error('Error in analyzeVideo:', error);
-  //     return {success: false,
-  //       error: error.message
-  //     };
-  //   }
-  // }
-
+  @Post('extract-text')
+  async extractText(@Body('url') url: string): Promise<{ transcription: string }> {
+    const transcription = await this.videoService.extractTextFromVideo(url);
+    return { transcription };
+  }
 
 }

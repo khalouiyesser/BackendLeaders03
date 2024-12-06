@@ -50,10 +50,12 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
-  @Put('/savePost/:id')
-  async savedPost(@Param('id') userId: string, @Body('postId') postId: string) {
+  @Put('/savePost/:idUser/:idPost')
+  async savedPost(@Param('idUser') userId: string, @Param('idPost') postId: string) {
+    console.log("userId", userId , " postId", postId);
     return this.userService.savePost(userId, postId);
   }
+
 
 
 

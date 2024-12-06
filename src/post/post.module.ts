@@ -37,11 +37,12 @@ import { Post, PostSchema } from './entities/post.entity';
 import { UserModule } from '../user/user.module';
 import { User, UserSchema } from '../auth/schemas/user.schema';
 import { VideoModule } from '../video/video.module';
-import {ClaudeApi} from "../services/Claude.service";  // Ajoutez cette ligne pour importer VideoModule
+import {ClaudeApi} from "../services/Claude.service";
+import {UserService} from "../user/user.service";  // Ajoutez cette ligne pour importer VideoModule
 
 @Module({
   controllers: [PostController],
-  providers: [PostService,ClaudeApi],
+  providers: [PostService,ClaudeApi,UserService],
   imports: [
     MongooseModule.forFeature([
       {

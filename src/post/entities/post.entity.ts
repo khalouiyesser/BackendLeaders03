@@ -6,6 +6,9 @@ import {Commentaire} from "../../commentaire/entities/commentaire.entity";
 
 @Schema({ timestamps: true })
 export class Post {
+  toObject(): any {
+      throw new Error('Method not implemented.');
+  }
 
   @Prop({ required: true })
   title: string; // Titre du post
