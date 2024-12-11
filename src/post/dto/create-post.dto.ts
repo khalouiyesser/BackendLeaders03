@@ -1,7 +1,7 @@
 import {IsNotEmpty, IsString, IsArray, IsOptional} from 'class-validator';
 import { Types } from 'mongoose';
 import {Commentaire} from "../../commentaire/entities/commentaire.entity";
-import {User} from "../../auth/schemas/user.schema";
+
 
 export class CreatePostDto {
   @IsNotEmpty()

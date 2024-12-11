@@ -76,4 +76,8 @@ export class SignupDto {
   @IsString()
   postId: string
 
+  @IsOptional()
+  @IsString()
+  profileDescription: string
+
 }

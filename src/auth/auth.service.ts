@@ -201,7 +201,10 @@ export class AuthService {
   }
   async forgotPassword(email: string) {
     //Check that user exists
+
+    console.log(email)
     const user = await this.UserModel.findOne({ email });
+
 
     if (user) {
       //If user exists, generate password reset link
@@ -265,6 +268,9 @@ export class AuthService {
   // }
 
   async resetPassword(newPassword: string, resetToken: string) {
+
+
+    console.log("11111111")
     //Find a valid reset token document
     const token = await this.ResetTokenModel.findOneAndDelete({
       token: resetToken,

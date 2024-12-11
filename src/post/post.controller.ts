@@ -51,6 +51,7 @@ export class PostController {
       @UploadedFile() file: Express.Multer.File,
       @Body() createPostDto: CreatePostDto
   ) {
+    console.log(createPostDto)
     // Appeler le service pour créer un post avec vidéo
     return await this.postService.createWithVideo(file, createPostDto);
 

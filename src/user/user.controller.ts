@@ -1,9 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Put,
+  UploadedFiles
+} from '@nestjs/common';
 import { UserService } from './user.service';
 // import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UploadFileService } from '../services/uploadFile.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {FileInterceptor, FilesInterceptor} from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import {PostService} from "../post/post.service";
 
@@ -60,42 +72,72 @@ export class UserController {
 
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('photoUrl'))
+  @UseInterceptors(FilesInterceptor('files', 2)) // Limite à 2 fichiers
   async updateProfile(
-    @Param('id') id: string,
-    @Body() updateProfileDto: UpdateUserDto,
-    @UploadedFile() photo?: Express.Multer.File,
+      @Param('id') id: string,
+      @Body() updateProfileDto: UpdateUserDto,
+      @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    // Upload la photo si elle est présente
-    // Upload la photo si elle est présente
-    if (photo) {
-      const photoUrl = await this.uploadFileService.uploadImageA(photo);
-      updateProfileDto.photoUrl = photoUrl;
+    let photoUrl: string | undefined;
+    let videoUrl: string | undefined;
+
+    // Parcours des fichiers pour déterminer leur type
+    for (const file of files) {
+      if (file.mimetype.startsWith('image/')) {
+        photoUrl = await this.uploadFileService.uploadImageA(file);
+      } else if (file.mimetype.startsWith('video/')) {
+        videoUrl = await this.uploadFileService.uploadVideo(file); // Implémentez uploadVideo
+      }
     }
 
-    // Appelle le service pour mettre à jour le profil dans la base de données
+    // Mise à jour des URL dans le DTO
+    if (photoUrl) {
+      updateProfileDto.photoUrl = photoUrl;
+    }
+    if (videoUrl) {
+      updateProfileDto.cv = videoUrl;
+      updateProfileDto.profileDescription = await this.userService.transcribeVideo(videoUrl);
+      console.log(updateProfileDto.profileDescription)
+    }
+
+
+    // Mise à jour du profil dans la base de données
     const updatedUser = await this.userService.updateUser(id, updateProfileDto);
-    console.log(updatedUser)
+
     return {
-      // message: 'Profile updated successfully',
-      // data: updatedUser,
-
-      // user: {
-
-
-        posts: updatedUser.posts,
-        id: updatedUser.id,
-        // name: updatedUser.name,
-        // lastname: updatedUser.lastname,
-        // email: updatedUser.email,
-        // phoneNumber: updatedUser.phoneNumber,
-        // domaine: updatedUser.domaine,
-        photoUrl: updatedUser.photoUrl,
-        // bio: updatedUser.bio,
-        // updatedAt: updatedUser.updatedAt,
-      // },
+      id: updatedUser.id,
+      photoUrl: updatedUser.photoUrl,
+      videoUrl: updatedUser.cv,
+      posts: updatedUser.posts,
+      "desc" : updatedUser.profileDescription,
     };
   }
+
+
+  // @Put(':id')
+  // @UseInterceptors(FileInterceptor('photoUrl'))
+  // async updateProfile(
+  //   @Param('id') id: string,
+  //   @Body() updateProfileDto: UpdateUserDto,
+  //   @UploadedFile() photo?: Express.Multer.File,
+  // ) {
+  //   // Upload la photo si elle est présente
+  //   // Upload la photo si elle est présente
+  //   if (photo) {
+  //     const photoUrl = await this.uploadFileService.uploadImageA(photo);
+  //     updateProfileDto.photoUrl = photoUrl;
+  //   }
+  //
+  //   // Appelle le service pour mettre à jour le profil dans la base de données
+  //   const updatedUser = await this.userService.updateUser(id, updateProfileDto);
+  //   console.log(updatedUser)
+  //   return {
+  //       posts: updatedUser.posts,
+  //       id: updatedUser.id,
+  //       photoUrl: updatedUser.photoUrl,
+  //
+  //   };
+  // }
   // @Put(':id')
   //
   // async updateProfile(

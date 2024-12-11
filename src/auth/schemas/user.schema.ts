@@ -57,6 +57,10 @@ export class User extends Document {
   @Prop({ type: [{ type: Object }] })
   savedPost: Post[];
 
+  @Prop({ required: false})
+  profileDescription : string
+
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -122,6 +122,7 @@ export class PostService {
     for (const post of posts) {
       // Vérification si un utilisateur est associé au post
       if (post.user) {
+        // console.log("1111111",post.user)
         // Recherche de l'utilisateur par ID
         const user = await this.userModel.findById(post.user).exec();
         if (user) {

@@ -11,7 +11,7 @@ import { SmsDto } from './dtos/Sms.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { FindUserDto } from './dtos/findUser.dto';
+
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Auth')
@@ -76,6 +76,7 @@ export class AuthController {
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
+    console.log("aaaaaaaaaaaaaaaaaaaa")
     return this.authService.resetPassword(
       resetPasswordDto.newPassword,
       resetPasswordDto.resetToken,
