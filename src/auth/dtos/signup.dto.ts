@@ -66,6 +66,9 @@ export class SignupDto {
   @IsString()
   photoUrl: string;
 
+  @IsString()
+  @IsOptional()
+  Role : string
 
   @IsOptional()
   @IsString()

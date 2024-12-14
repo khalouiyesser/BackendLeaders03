@@ -33,6 +33,14 @@ export class PostController {
   //   return this.postService.create(createPostDto);  // Utilise l'ID de l'utilisateur pour créer le post
   // }
 
+  @Get('survey/:id') // Utilisez ':' pour spécifier une variable dans l'URL
+  async getSurvey(@Param('id') id: string) {
+    const post = await this.postService.findOne(id);
+
+    return post.survey;
+  }
+
+
 
 
   @Post()
@@ -56,8 +64,8 @@ export class PostController {
     return await this.postService.createWithVideo(file, createPostDto);
 
   }
-  @Post("claude/:description")
-  async generateQuestions(@Param('description') description: string) {
+  @Post("claude/:idPost/:description")
+  async generateQuestions(@Param('idPost') idPost: string,@Param('description') description: string) {
     try {
       // Générer les questions
       console.log("claude1")
@@ -75,7 +83,26 @@ export class PostController {
       const question9 = questions.question9;
       const question10 = questions.question10;
       // Retourner un objet avec les questions individuelles
+
+      const survey = [
+        questions.question1,
+        questions.question2,
+        questions.question3,
+        questions.question4,
+        questions.question5,
+        questions.question6,
+        questions.question7,
+        questions.question8,
+        questions.question9,
+        questions.question10,
+      ];
+
+      const a = this.postService.updatePost(idPost,survey)
+
+
+
       return {
+        a,
         question1,
         question2,
         question3,
@@ -86,6 +113,7 @@ export class PostController {
         question8,
         question9,
         question10,
+
         // Vous pouvez également retourner l'objet complet si nécessaire
         // allQuestions: questions
       };

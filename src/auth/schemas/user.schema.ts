@@ -51,8 +51,10 @@ export class User extends Document {
   @Prop({ required: false ,default:'candidat' })
   Role : string
 
+
   @Prop({ required: false})
   Bio : string
+
 
   @Prop({ type: [{ type: Object }] })
   savedPost: Post[];

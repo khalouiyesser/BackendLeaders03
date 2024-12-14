@@ -97,6 +97,20 @@ export class PostService {
   }
 
 
+  async updatePost(id: string, survey: any): Promise<Post> {
+    // Recherche du post par ID
+    const existingPost = await this.postModel.findById(id);
+    if (!existingPost) {
+      throw new NotFoundException(`Post avec l'id ${id} introuvable`);
+    }
+
+    // Ajout ou mise à jour de la variable survey
+    existingPost.survey = survey;
+
+    // Sauvegarde des modifications
+    return existingPost.save();
+  }
+
   async findByUser(id: string): Promise<Post[]> {
     // Trouver tous les posts associés à l'utilisateur
     const posts = await this.postModel.find({ user: id }).exec();
@@ -159,8 +173,10 @@ export class PostService {
       ...post.toObject(),
       userName: (post as any).userName, // Champ supplémentaire
       photoUrl: (post as any).photoUrl, // Champ supplémentaire
-      videoUrl: (post as any).videoUrl, // Champ supplémentaire
-    }));
+      videoUrl: (post as any).videoUrl,
+      statusCode: "200",
+    }))
+
   }
   async SavedPost(idUser: string): Promise<any[]> {
     // Récupération de l'utilisateur avec ses posts

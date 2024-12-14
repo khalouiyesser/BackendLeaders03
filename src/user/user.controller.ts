@@ -9,13 +9,13 @@ import {
   UploadedFile,
   UseInterceptors,
   Put,
-  UploadedFiles
+  UploadedFiles, HttpStatus, HttpException
 } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UploadFileService } from '../services/uploadFile.service';
-import {FileInterceptor, FilesInterceptor} from '@nestjs/platform-express';
+import {FileFieldsInterceptor, FileInterceptor, FilesInterceptor} from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import {PostService} from "../post/post.service";
 
@@ -71,47 +71,82 @@ export class UserController {
 
 
 
-  @Put(':id')
-  @UseInterceptors(FilesInterceptor('files', 2)) // Limite à 2 fichiers
+  @Put('update/:id')
+  @UseInterceptors(
+      FileFieldsInterceptor([
+        { name: 'file', maxCount: 1 }, // Pour l'image
+        { name: 'file1', maxCount: 1 } // Pour la vidéo
+      ])
+  )
   async updateProfile(
       @Param('id') id: string,
       @Body() updateProfileDto: UpdateUserDto,
-      @UploadedFiles() files?: Express.Multer.File[],
+      @UploadedFiles()
+          files: {
+        file?: Express.Multer.File[];
+        file1?: Express.Multer.File[];
+      },
   ) {
-    let photoUrl: string | undefined;
-    let videoUrl: string | undefined;
 
-    // Parcours des fichiers pour déterminer leur type
-    for (const file of files) {
-      if (file.mimetype.startsWith('image/')) {
-        photoUrl = await this.uploadFileService.uploadImageA(file);
-      } else if (file.mimetype.startsWith('video/')) {
-        videoUrl = await this.uploadFileService.uploadVideo(file); // Implémentez uploadVideo
+
+    console.log("1111111111111111111111")
+
+
+    console.log(updateProfileDto)
+
+    console.log(files)
+
+    try {
+      let photoUrl: string | undefined;
+      let videoUrl: string | undefined;
+
+      // Gestion des fichiers (image et vidéo)
+      if (files.file && files.file[0]) {
+        photoUrl = await this.uploadFileService.uploadImageA(files.file[0]);
       }
+      if (files.file1 && files.file1[0]) {
+        videoUrl = await this.uploadFileService.uploadVideo(files.file1[0]);
+      }
+
+      // Mise à jour des URL dans le DTO
+      if (photoUrl) {
+        updateProfileDto.photoUrl = photoUrl;
+      }
+      if (videoUrl) {
+        updateProfileDto.cv = videoUrl;
+
+        // Transcription de la vidéo pour obtenir une description
+        const description = await this.userService.transcribeVideo(videoUrl);
+        updateProfileDto.profileDescription = description || 'Description non disponible';
+      }
+
+      // Mise à jour du profil dans la base de données
+      const updatedUser = await this.userService.updateUser(id, updateProfileDto);
+
+      // Réponse en cas de succès
+      return {
+        message: 'Profil mis à jour avec succès',
+        id: updatedUser.id,
+        photoUrl: updatedUser.photoUrl,
+        videoUrl: updatedUser.cv,
+        posts: updatedUser.posts,
+        desc: updatedUser.profileDescription,
+      };
+    } catch (error) {
+      // Gestion des erreurs
+      console.error('Erreur lors de la mise à jour du profil:', error.message);
+
+      // Renvoyer une erreur personnalisée au client
+      throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Une erreur est survenue lors de la mise à jour du profil. Veuillez réessayer plus tard.',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    // Mise à jour des URL dans le DTO
-    if (photoUrl) {
-      updateProfileDto.photoUrl = photoUrl;
-    }
-    if (videoUrl) {
-      updateProfileDto.cv = videoUrl;
-      updateProfileDto.profileDescription = await this.userService.transcribeVideo(videoUrl);
-      console.log(updateProfileDto.profileDescription)
-    }
-
-
-    // Mise à jour du profil dans la base de données
-    const updatedUser = await this.userService.updateUser(id, updateProfileDto);
-
-    return {
-      id: updatedUser.id,
-      photoUrl: updatedUser.photoUrl,
-      videoUrl: updatedUser.cv,
-      posts: updatedUser.posts,
-      "desc" : updatedUser.profileDescription,
-    };
   }
+
 
 
   // @Put(':id')

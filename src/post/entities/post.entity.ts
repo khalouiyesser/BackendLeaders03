@@ -44,6 +44,9 @@ export class Post {
   @Prop()
   photoUrl: string;
 
+  @Prop()
+  survey: string[];
+
 
 }
 

@@ -31,6 +31,9 @@ export class CreatePostDto {
   @IsOptional()
   commentaires: Commentaire[]; // Tableau d'objets Post
 
+  @IsNotEmpty()
+  @IsOptional()
+  survey: string[]; // Tableau d'objets Post
 
 
 

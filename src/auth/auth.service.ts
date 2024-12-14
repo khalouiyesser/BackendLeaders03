@@ -100,8 +100,11 @@ export class AuthService {
   //   };
   // }
   async signup(signupData: SignupDto) {
-    const { email, password, name, lastname } = signupData;
+    const { email, password, name, lastname,Role } = signupData;
 
+
+
+    console.log(signupData)
     // Convertir l'email en minuscules
     const emailLowerCase = email.toLowerCase();
 
@@ -120,6 +123,7 @@ export class AuthService {
       email: emailLowerCase,  // Enregistrer l'email en minuscule
       password: hashedPassword,
       lastname,
+      Role,
     });
 
     // Sauvegarder l'utilisateur dans MongoDB
