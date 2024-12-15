@@ -43,10 +43,10 @@ export class PostService {
 
   async createWithVideo(file: Express.Multer.File, createPostDto: CreatePostDto): Promise<Post> {
 
-    console.log('File received:', file);
-    console.log('File size:', file.size);
-    console.log('File mimetype:', file.mimetype);
-    console.log('Post DTO:', createPostDto);
+    // console.log('File received:', file);
+    // console.log('File size:', file.size);
+    // console.log('File mimetype:', file.mimetype);
+    // console.log('Post DTO:', createPostDto);
 
     try {
       // Étape 1 : Créer une vidéo si un fichier est fourni
