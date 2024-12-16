@@ -133,6 +133,8 @@ export class PostService {
     // Récupération des posts avec les vidéos associées
     const posts = await this.postModel.find().exec();
 
+
+    console.log(posts)
     for (const post of posts) {
       // Vérification si un utilisateur est associé au post
       if (post.user) {
@@ -173,7 +175,7 @@ export class PostService {
       ...post.toObject(),
       userName: (post as any).userName, // Champ supplémentaire
       photoUrl: (post as any).photoUrl, // Champ supplémentaire
-      videoUrl: (post as any).videoUrl,
+      videoUrl: (post as any).videoUrl, // Champ supplémentaire
       statusCode: "200",
     }))
 
