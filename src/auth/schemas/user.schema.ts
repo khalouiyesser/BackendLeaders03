@@ -62,6 +62,7 @@ export class User extends Document {
   @Prop({ required: false})
   profileDescription : string
 
+
   // @Prop({ required: false})
   // follow : number
   //
