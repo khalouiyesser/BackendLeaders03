@@ -22,6 +22,46 @@ export class PostulerController {
     return this.postulerService.findOne(+id);
   }
 
+
+
+
+
+
+  /////// statistique
+   /*
+
+   le retour est :
+   [
+    {
+        "postName": "hello",
+        "postulations": 8
+    },
+    {
+        "postName": "jjjd",
+        "postulations": 0
+    },
+    {
+        "postName": "hshsh",
+        "postulations": 0
+    },
+    {
+        "postName": "hshsh",
+        "postulations": 0
+    }
+  ]
+
+
+    */
+
+
+
+  @Get('stats/:id')
+  stat(@Param('id') id: string) {
+    return this.postulerService.stats(id);
+  }
+
+
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostulerDto: UpdatePostulerDto) {
     return this.postulerService.update(+id, updatePostulerDto);

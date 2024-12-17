@@ -7,6 +7,8 @@ import {Postuler} from "./entities/postuler.entity";
 import {User} from "../auth/schemas/user.schema";
 import {Post} from "../post/entities/post.entity";
 import {ClaudeApi} from "../services/Claude.service";
+import {PostService} from "../post/post.service";
+// import {PostService} from "../post/post.service";
 
 @Injectable()
 export class PostulerService {
@@ -14,7 +16,9 @@ export class PostulerService {
   constructor( @InjectModel(Postuler.name) private readonly postulerModel: Model<Postuler>,
                @InjectModel(User.name) private readonly userModel: Model<User>,
                @InjectModel(Post.name) private readonly postModel: Model<Post>,
-               private readonly claudeService: ClaudeApi,) {
+               private readonly claudeService: ClaudeApi,
+               private readonly postService: PostService,
+               ) {
   }
 
 
@@ -92,5 +96,36 @@ export class PostulerService {
     // Retourner la liste des candidats
     return candidats;
   }
+
+  async stats(userId: string) {
+    // Récupérer les posts de l'utilisateur
+    const posts = await this.postService.findByUser(userId);
+
+
+    // Récupérer toutes les postulations
+    const postuler = await this.postulerModel.find().exec();
+
+    // Préparer la réponse
+    const response = [];
+
+    // Boucle sur chaque post
+    for (const post of posts) {
+      console.log(post['id'])
+      // Filtrer les postulations pour ce post
+      const count = postuler.filter((p) => p.post.toString() === post['id']).length;
+
+      // Ajouter le résultat à la réponse
+      response.push({
+        postName: post.title, // Assure-toi que "name" est le champ du nom du poste
+        postulations: count,
+      });
+    }
+
+    // Retourner la réponse
+    return response;
+  }
+
+
+
 
 }

@@ -7,6 +7,8 @@ import {Postuler, PostulerSchema} from "./entities/postuler.entity";
 import {User, UserSchema} from "../auth/schemas/user.schema";
 import {Post, PostSchema} from "../post/entities/post.entity";
 import {ClaudeApi} from "../services/Claude.service";
+import {PostModule} from "../post/post.module";
+// import {PostService} from "../post/post.service";
 
 @Module({
   controllers: [PostulerController],
@@ -33,6 +35,7 @@ import {ClaudeApi} from "../services/Claude.service";
       },
 
     ]),
+      PostModule,
   ],
 
   exports: [MongooseModule],

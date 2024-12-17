@@ -59,6 +59,6 @@ import {UserService} from "../user/user.service";  // Ajoutez cette ligne pour i
     UserModule,
     VideoModule,  // Ajoutez VideoModule ici
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule,PostService],
 })
 export class PostModule {}
