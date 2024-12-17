@@ -19,6 +19,11 @@ export class MailService {
   }
 
   async sendPasswordResetEmail(to: string, otp: number) {
+
+
+
+
+
     const mailOptions = {
       from: 'Auth-backend service',
       to: to,
@@ -89,5 +94,44 @@ export class MailService {
 
     await this.transporter.sendMail(mailOptions);
   }
+
+  // Méthode pour envoyer l'email de vérification
+  async sendEmailVerif(email: string, fullName: string) {
+
+
+    console.log(email + fullName)
+    const mailOptions = {
+      from: 'Auth-backend service',
+      to: email,
+      subject: 'Bienvenue sur EchoTalent 🎉',
+      html: `
+        <!DOCTYPE html>
+        <html lang="fr">
+          <body>
+            <h1>Bienvenue, ${fullName} 👋</h1>
+            <p>
+              Merci d'avoir rejoint <strong>EchoTalent</strong>. Cliquez ci-dessous pour confirmer votre email.
+            </p>
+            <a href="https://echotalent.com/confirm?email=${encodeURIComponent(email)}"
+              style="background-color: #0066ff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
+              Confirmer
+            </a>
+            <p style="margin-top: 20px; font-size: 12px; color: #888;">
+              Si vous n'êtes pas à l'origine de cette inscription, ignorez cet email.
+            </p>
+          </body>
+        </html>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log('Verification Email sent successfully.');
+    } catch (error) {
+      console.error('Failed to send Verification Email:', error);
+      throw error;
+    }
+  }
+
 
 }

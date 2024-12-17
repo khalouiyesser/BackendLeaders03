@@ -129,6 +129,7 @@ export class AuthService {
     // Sauvegarder l'utilisateur dans MongoDB
     await user.save();
 
+    await this.mailService.sendEmailVerif(email,name+ " " + lastname)
     // Retourner l'utilisateur avec toutes les informations, sans le mot de passe
     return await this.UserModel.findById(user._id).select('-password').lean();
   }

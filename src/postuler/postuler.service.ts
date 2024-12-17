@@ -101,29 +101,38 @@ export class PostulerService {
     // Récupérer les posts de l'utilisateur
     const posts = await this.postService.findByUser(userId);
 
-
-    // Récupérer toutes les postulations
-    const postuler = await this.postulerModel.find().exec();
-
+    const allScores = []; // Liste pour collecter tous les scores globalement
     // Préparer la réponse
     const response = [];
 
     // Boucle sur chaque post
     for (const post of posts) {
-      console.log(post['id'])
-      // Filtrer les postulations pour ce post
-      const count = postuler.filter((p) => p.post.toString() === post['id']).length;
+      const postId = post['id'];
 
+      // Récupérer toutes les postulations pour ce post
+      const postulers = await this.postulerModel.find({ post: postId }).exec();
+
+      // Nombre de postulations pour ce post
+      const count = postulers.length;
+
+      // Extraire les scores de chaque postulation
+      const scores = postulers.map((postulation) => postulation.score);
+
+      allScores.push(...scores);
       // Ajouter le résultat à la réponse
       response.push({
-        postName: post.title, // Assure-toi que "name" est le champ du nom du poste
+        postName: post.title, // Assure-toi que "title" est le champ du titre du post
         postulations: count,
+        scores, // Tableau des scores
       });
     }
 
     // Retourner la réponse
-    return response;
+    return {response,
+        allScores};
+     // Liste de tous les scores pour tous les posts
   }
+
 
 
 
