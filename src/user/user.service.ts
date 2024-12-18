@@ -4,7 +4,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import {UpdateUserDto} from './dto/update-user.dto';
 // import { User } from './entities/user.entity';
-import {Model} from 'mongoose';
+import {Model, Types} from 'mongoose';
 import {InjectModel} from '@nestjs/mongoose';
 import {SignupDto} from '../auth/dtos/signup.dto';
 import {User} from '../auth/schemas/user.schema';
@@ -39,6 +39,57 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async follow(userId: string, userToFollowId: string): Promise<void> {
+    // Récupérer les utilisateurs
+    const user = await this.userModel.findById(userId).exec();
+    const userToFollow = await this.userModel.findById(userToFollowId).exec();
+
+    if (!user || !userToFollow) {
+      throw new Error('User or user to follow not found');
+    }
+
+    // Vérification si l'utilisateur à suivre est déjà dans la liste `follow`
+    if (!user.follow.some((id: Types.ObjectId) => id.equals(userToFollow.id))) {
+      user.follow.push(userToFollow.id); // Stocker l'ID
+    }
+
+    // Vérification si le suiveur est déjà dans la liste `followers`
+    if (!userToFollow.followers.some((id: Types.ObjectId) => id.equals(user.id))) {
+      userToFollow.followers.push(user.id); // Stocker l'ID
+    }
+
+    // Sauvegarder les deux utilisateurs
+    await user.save();
+    await userToFollow.save();
+  }
+
+
+  async getUserFollowData(userId: string): Promise<{ follow: any[]; followers: any[] }> {
+    // Récupérer l'utilisateur avec les relations peuplées
+    const user = await this.userModel
+        .findById(userId)
+        .populate('follow', 'name lastname photoUrl') // Charger seulement les champs nécessaires
+        .populate('followers', 'name lastname photoUrl') // Charger seulement les champs nécessaires
+        .exec();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Construire les résultats
+    const followData = user.follow.map((followedUser: any) => ({
+      fullName: `${followedUser.name} ${followedUser.lastname}`,
+      photoUrl: followedUser.photoUrl,
+    }));
+
+    const followersData = user.followers.map((follower: any) => ({
+      fullName: `${follower.name} ${follower.lastname}`,
+      photoUrl: follower.photoUrl,
+    }));
+
+    return { follow: followData, followers: followersData };
   }
 
 

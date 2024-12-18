@@ -63,11 +63,12 @@ export class User extends Document {
   profileDescription : string
 
 
-  @Prop({ required: false})
-  follow : User[]
+  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] }) // Stocker les IDs des utilisateurs suivis
+  follow: Types.ObjectId[];
 
-  @Prop({ required: false})
-  followers : User[]
+  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] }) // Stocker les IDs des abonnés
+  followers: Types.ObjectId[];
+
 
 }
 

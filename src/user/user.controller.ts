@@ -39,6 +39,13 @@ export class UserController {
     return this.userService.findAll();
   }
 
+
+  @Get('followAndFollowers/:id')
+  getFollowers(@Param('id') id: string)  {
+    return this.userService.getUserFollowData(id);
+  }
+
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.userService.findOne(id);
@@ -67,6 +74,11 @@ export class UserController {
     console.log("userId", userId , " postId", postId);
     return this.userService.savePost(userId, postId);
   }
+  @Put('/follow/:idUser/:idUserToFollow')
+  async follow(@Param('idUser') userId: string, @Param('idUserToFollow') userToFollow: string) {
+    return this.userService.follow(userId, userToFollow);
+  }
+
 
 
 

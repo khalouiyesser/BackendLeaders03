@@ -182,12 +182,14 @@ export class PostService {
     }))
 
   }
-  async SavedPost(idUser: string): Promise<any[]> {
+  async SavedPost(idUser: string){
     // Récupération de l'utilisateur avec ses posts
     const user = await this.userModel.findById(idUser).populate('savedPost').exec();
     if (!user || !user.savedPost) {
-      throw new Error("Utilisateur introuvable ou aucun post sauvegardé");
+      // throw new Error("Utilisateur introuvable ou aucun post sauvegardé");
+      return "aucune posts"
     }
+
 
     const posts = user.savedPost; // `savedPost` est déjà peuplé avec `populate`
 
