@@ -48,9 +48,11 @@ export class PostService {
     // console.log('File mimetype:', file.mimetype);
     // console.log('Post DTO:', createPostDto);
 
+    console.log(createPostDto.user)
     try {
       // Étape 1 : Créer une vidéo si un fichier est fourni
       let videoId: Types.ObjectId | null = null;
+
 
       if (file) {
         // Appeler le service vidéo pour créer la vidéo

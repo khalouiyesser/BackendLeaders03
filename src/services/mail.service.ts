@@ -101,7 +101,7 @@ export class MailService {
 
     console.log(email + fullName)
     const mailOptions = {
-      from: 'Auth-backend service',
+      from: 'yesser.khaloui@etudiant-fst.utm.tn',
       to: email,
       subject: 'Bienvenue sur EchoTalent 🎉',
       html: `

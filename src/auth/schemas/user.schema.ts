@@ -63,11 +63,12 @@ export class User extends Document {
   profileDescription : string
 
 
-  // @Prop({ required: false})
-  // follow : number
-  //
-  // @Prop({ required: false})
-  // followers : number
+  @Prop({ required: false})
+  follow : User[]
+
+  @Prop({ required: false})
+  followers : User[]
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

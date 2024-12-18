@@ -152,7 +152,7 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
 
-    const { name, lastname, phoneNumber, codePostal, website, domaine, photoUrl, posts, Role } = user;
+    const { name, lastname, phoneNumber, codePostal, website, domaine, photoUrl, posts, Role,follow,followers } = user;
 
     // Générer les tokens JWT
     const tokens = await this.generateUserTokens(user);
@@ -168,8 +168,10 @@ export class AuthService {
       website,
       photoUrl,
       userId: user._id,
-      posts,
+      // posts,
       Role,
+      follow,
+      followers,
       statusCode: 200
     };
   }

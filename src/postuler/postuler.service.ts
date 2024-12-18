@@ -133,8 +133,4 @@ export class PostulerService {
      // Liste de tous les scores pour tous les posts
   }
 
-
-
-
-
 }

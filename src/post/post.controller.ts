@@ -42,7 +42,6 @@ export class PostController {
 
 
 
-
   @Post()
   @UseInterceptors(FileInterceptor('file')) // Gérer l'upload de fichier
   async create(
