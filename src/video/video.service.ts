@@ -348,4 +348,11 @@ export class VideoService {
       throw new Error(`Erreur lors de la suppression de la vidéo : ${error.message}`);
     }
   }
+
+
+  async findByUrl(url: string): Promise<Video | null> {
+    console.log("vvvvvvvvvvvvvvvvvvvvvvvvvvvvv",url)
+    return this.VideoModel.findOne({ url }).exec();
+  }
+
 }

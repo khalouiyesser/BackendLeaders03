@@ -136,7 +136,7 @@ export class PostService {
     const posts = await this.postModel.find().exec();
 
 
-    console.log(posts)
+   // console.log(posts)
     for (const post of posts) {
       // Vérification si un utilisateur est associé au post
       if (post.user) {
@@ -320,6 +320,72 @@ export class PostService {
     }
   }
 
+  async likeIos(videoUrl: string): Promise<{ nombreLikes: number }> {
+    console.log("Video URL:", videoUrl);
+
+    // Recherche de tous les posts
+    const posts = await this.findAll();
+
+    // Trouver le post associé au videoUrl
+    const toUpdate = posts.find((post) => post.videoUrl === videoUrl);
+
+    if (!toUpdate) {
+      throw new Error(`Post not found for the given videoUrl: ${videoUrl}`);
+    }
+
+    // Incrémenter le compteur de likes
+    const updatedPost = await this.postModel
+        .findByIdAndUpdate(
+            toUpdate._id,
+            { $inc: { nbLikes: 1 } },
+            { new: true }  // Pour récupérer l'objet mis à jour
+        )
+        .exec();
+
+    if (!updatedPost) {
+      throw new Error("Post could not be updated");
+    }
+
+    console.log("Updated post:", updatedPost);
+
+    // Retourner l'objet avec la clé 'nombreLikes'
+    return { nombreLikes: updatedPost.nbLikes };
+  }
+
+
+
+
+  async deslikeIos(videoUrl: string): Promise<{ nombreLikes: number }> {
+    console.log("Video URL:", videoUrl);
+
+    // Recherche de tous les posts
+    const posts = await this.findAll();
+
+    // Trouver le post associé au videoUrl
+    const toUpdate = posts.find((post) => post.videoUrl === videoUrl);
+
+    if (!toUpdate) {
+      throw new Error(`Post not found for the given videoUrl: ${videoUrl}`);
+    }
+
+    // Décrémenter le compteur de likes
+    const updatedPost = await this.postModel
+        .findByIdAndUpdate(
+            toUpdate._id,
+            { $inc: { nbLikes: -1 } },
+            { new: true }  // Pour récupérer l'objet mis à jour
+        )
+        .exec();
+
+    if (!updatedPost) {
+      throw new Error("Post could not be updated");
+    }
+
+    console.log("Updated post:", updatedPost);
+
+    // Retourner l'objet avec la clé 'nombreLikes'
+    return { nombreLikes: updatedPost.nbLikes };
+  }
 
 
 }

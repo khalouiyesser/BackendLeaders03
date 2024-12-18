@@ -211,7 +211,7 @@ export class AuthService {
 
     console.log(email)
     const user = await this.UserModel.findOne({ email });
-
+    console.log(user)
 
     if (user) {
       //If user exists, generate password reset link
@@ -258,7 +258,7 @@ export class AuthService {
       });*/
       const code = Math.floor(100000 + Math.random() * 900000);
       //Send the link to the user by email
-      this.smsService.sendSms(phoneNumber, code);
+      await this.smsService.sendSms(phoneNumber, code);
       return {"number" :  phoneNumber ,"code": code, user};
     }
 

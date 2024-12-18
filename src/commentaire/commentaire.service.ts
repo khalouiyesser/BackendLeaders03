@@ -8,6 +8,8 @@ import {Commentaire} from "./entities/commentaire.entity";
 import {Post} from "../post/entities/post.entity";
 import {User} from "../auth/schemas/user.schema";
 
+import {PostService} from "../post/post.service";
+
 @Injectable()
 export class CommentaireService {
 
@@ -16,6 +18,7 @@ export class CommentaireService {
       @InjectModel(User.name) private readonly userModel: Model<User>,
       @InjectModel(Commentaire.name) private readonly commentaireModel: Model<Commentaire>,
       @InjectModel(Post.name) private readonly postModel: Model<Post>,
+       private postService: PostService,
       // private commentaireService: CommentaireService,
   ) {}
 
@@ -93,8 +96,60 @@ export class CommentaireService {
   }
 
 
+  async createIos(videoUrl: string, user: string, contenu: string): Promise<Commentaire> {
+    console.log("Video URL:", videoUrl);
 
+    // Rechercher tous les posts
+    const posts = await this.postService.findAll();
+    console.log("Posts video URLs:", posts.map(post => post.videoUrl));
 
+    // Trouver le post correspondant
+    const toUpdate = posts.find((post) => post.videoUrl === videoUrl);
+    if (!toUpdate) {
+      throw new NotFoundException(`Post not found for the given videoUrl: ${videoUrl}`);
+    }
+
+    console.log("Post to update:", toUpdate);
+
+    // Rechercher le Post complet
+    const fullPost = await this.postModel.findById(toUpdate._id).exec();
+    if (!fullPost) {
+      throw new NotFoundException('Post not found in the database');
+    }
+
+    // Rechercher l'utilisateur complet
+    const fullUser = await this.userModel.findById(user).exec();
+    if (!fullUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Construire le commentaire avec les objets complets user et post
+    const newCommentaire = new this.commentaireModel({
+      user: fullUser._id, // Sauvegarder uniquement l'ID de l'utilisateur
+      Contenu : contenu,            // Le contenu du commentaire
+      post: fullPost._id, // Sauvegarder uniquement l'ID du post
+    });
+
+    // Sauvegarder le commentaire dans la base de données
+    const savedCommentaire = await newCommentaire.save();
+    console.log("Commentaire saved:", savedCommentaire);
+
+    // Ajouter le commentaire dans la liste des commentaires du Post
+    const updatedPost = await this.postModel.findByIdAndUpdate(
+        fullPost._id, // Identifiant du Post à mettre à jour
+        { $push: { commentaires: savedCommentaire._id } }, // Ajouter le commentaire à la liste des commentaires
+        { new: true } // Retourner la version mise à jour du document
+    );
+
+    if (!updatedPost) {
+      throw new Error('Failed to update post with the new comment');
+    }
+
+    console.log("Updated Post with Comment:", updatedPost);
+
+    // Retourner le commentaire enregistré
+    return savedCommentaire;
+  }
 
 
 
@@ -125,6 +180,74 @@ export class CommentaireService {
   //
   //   return this.commentaireModel.create(savedCommentaire);
   // }
+
+
+  // async findCommentParVideo(videoUrl: string): Promise<Commentaire[]> {
+  //   // Récupérer tous les posts
+  //   const posts = await this.postService.findAll();
+  //
+  //   // Trouver le post correspondant à l'URL de la vidéo
+  //   const post = posts.find((post) => post.videoUrl === videoUrl);
+  //
+  //   // Vérifier si le post a été trouvé
+  //   if (!post) {
+  //     throw new NotFoundException('Post not found');
+  //   }
+  //
+  //   const comments = []
+  //   const listes = await this.commentaireModel.find({post: post._id}).exec();
+  //   for (const comment of listes) {
+  //     const user = await this.userModel.findById(comment.user)
+  //     if (user){
+  //       comment.populate('imageUrl' : user.photoUrl,
+  //     'fullName' : user.name + " " + user.lastname,)
+  //       comments.push(comment);
+  //     }
+  //
+  //   }
+  //   // Récupérer les commentaires associés à ce post
+  //   // return this.commentaireModel.find({ post: post._id }).exec(); // Utiliser _id pour la recherche
+  //   return comments
+  // }
+
+
+  async findCommentParVideo(videoUrl: string): Promise<Commentaire[]> {
+    // Récupérer tous les posts
+    const posts = await this.postService.findAll();
+
+    // Trouver le post correspondant à l'URL de la vidéo
+    const post = posts.find((post) => post.videoUrl === videoUrl);
+
+    // Vérifier si le post a été trouvé
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    // Récupérer les commentaires associés au post
+    const comments = await this.commentaireModel.find({ post: post._id }).exec();
+
+    // Ajouter les champs imageUrl et fullName dans le retour des commentaires
+    const enrichedComments = [];
+
+    for (const comment of comments) {
+      // Trouver l'utilisateur associé au commentaire
+      const user = await this.userModel.findById(comment.user).exec();
+
+      // Vérifier si l'utilisateur existe
+      if (user) {
+        // Ajouter imageUrl et fullName au commentaire
+        const enrichedComment = {
+          ...comment.toObject(),  // Convertir le commentaire en un objet pour ajouter des champs
+          imageUrl: user.photoUrl, // Ajouter l'URL de la photo de l'utilisateur
+          fullName: `${user.name} ${user.lastname}`, // Ajouter le nom complet de l'utilisateur
+        };
+        enrichedComments.push(enrichedComment);  // Ajouter le commentaire enrichi à la liste
+      }
+    }
+
+    // Retourner les commentaires enrichis
+    return enrichedComments;
+  }
 
 
 

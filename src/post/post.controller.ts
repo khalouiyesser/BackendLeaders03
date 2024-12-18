@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   UploadedFile,
-  UseInterceptors, NotFoundException
+  UseInterceptors, NotFoundException, Put
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -193,5 +193,34 @@ export class PostController {
   async dislike(@Param('id') id: string) {
     return this.postService.dislike(id);
   }
+
+  /*
+  like l ios lezmeek t7ot fel body videoUrl kif haka syntaxe
+  {
+ "videoUrl": "https://res.cloudinary.com/dcjtuxprn/video/upload/v1734447618/UploadLeaders/1000014911.mp4"
+}
+
+
+resultat haka
+{
+    "nombreLikes": 3
+}
+   */
+  @Patch('zaama/ios/like')
+  async likeIos(@Body('videoUrl') videoUrl: string) {
+    console.log("Video URL:", videoUrl);
+    return this.postService.likeIos(videoUrl);
+  }
+
+  // nafess like bedhabett
+  @Patch('zaama/ios/deslike')
+  async deslikeIos(@Body('videoUrl') videoUrl: string) {
+    console.log("Video URL:", videoUrl);
+    return this.postService.deslikeIos(videoUrl);
+  }
+
+
+
+
 
 }
