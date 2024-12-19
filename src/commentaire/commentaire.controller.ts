@@ -9,6 +9,7 @@ export class CommentaireController {
 
   @Post()
   create(@Body() createCommentaireDto: CreateCommentaireDto) {
+    console.log(createCommentaireDto)
    return this.commentaireService.create(createCommentaireDto);
   }
 
@@ -30,6 +31,7 @@ export class CommentaireController {
 
   @Get()
   findAll() {
+
     return this.commentaireService.findAll();
   }
 
@@ -58,8 +60,8 @@ export class CommentaireController {
    }
    */
   @Get('z/Getios')
-  getParPost(@Body('videoUrl') videoUrl: string) {
-    return this.commentaireService.findCommentParVideo(videoUrl);
+  getParPost(@Body('postId') videoUrl: string) {
+    return this.commentaireService.findCOmmentParPosts(videoUrl);
   }
 
 

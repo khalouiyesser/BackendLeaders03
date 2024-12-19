@@ -9,6 +9,9 @@ export class PostulerController {
 
   @Post()
   create(@Body() createPostulerDto: CreatePostulerDto) {
+
+    console.log("11111111111111111111")
+
     return this.postulerService.create(createPostulerDto);
   }
 

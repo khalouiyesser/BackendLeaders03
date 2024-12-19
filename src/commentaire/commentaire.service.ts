@@ -76,9 +76,9 @@ export class CommentaireService {
 
     // Construire le commentaire avec les objets complets user et post
     const newCommentaire = new this.commentaireModel({
-      user: fullUser,  // Utiliser l'objet complet user
+      user: user,  // Utiliser l'objet complet user
       Contenu,
-      post: fullPost,  // Utiliser l'objet complet post
+      post: post,  // Utiliser l'objet complet post
     });
 
     // Sauvegarder le commentaire dans la base de données
@@ -87,7 +87,7 @@ export class CommentaireService {
     // Ajouter le commentaire dans la liste des commentaires du Post
     await this.postModel.findByIdAndUpdate(
         post, // Identifiant du Post à mettre à jour
-        { $push: { commentaires: savedCommentaire } }, // Ajouter le commentaire au tableau
+        { $push: { commentaires: savedCommentaire._id } }, // Ajouter le commentaire au tableau
         { new: true } // Retourner la version mise à jour du document (optionnel si nécessaire)
     );
 
@@ -211,12 +211,12 @@ export class CommentaireService {
   // }
 
 
-  async findCommentParVideo(videoUrl: string): Promise<Commentaire[]> {
+  async findCommentParVideo(idPost: string): Promise<Commentaire[]> {
     // Récupérer tous les posts
     const posts = await this.postService.findAll();
 
     // Trouver le post correspondant à l'URL de la vidéo
-    const post = posts.find((post) => post.videoUrl === videoUrl);
+    const post = posts.find((post) => post.id === idPost);
 
     // Vérifier si le post a été trouvé
     if (!post) {
@@ -251,6 +251,30 @@ export class CommentaireService {
 
 
 
+  async findCOmmentParPosts(idPost: string): Promise<Commentaire[]> {
+    const comments = this.commentaireModel.find({post : idPost})
+    const enrichedComments = []
+    for (const comment of await comments) {
+      // Trouver l'utilisateur associé au commentaire
+      const user = await this.userModel.findById(comment.user).exec();
+
+      // Vérifier si l'utilisateur existe
+      if (user) {
+        // Ajouter imageUrl et fullName au commentaire
+        const enrichedComment = {
+          ...comment.toObject(),  // Convertir le commentaire en un objet pour ajouter des champs
+          imageUrl: user.photoUrl, // Ajouter l'URL de la photo de l'utilisateur
+          fullName: `${user.name} ${user.lastname}`, // Ajouter le nom complet de l'utilisateur
+        };
+        enrichedComments.push(enrichedComment);  // Ajouter le commentaire enrichi à la liste
+      }
+    }
+
+
+    return enrichedComments
+  }
+
+
   async findAll(): Promise<Commentaire[]> {
     return this.commentaireModel.find().exec(); // Récupérer tous les commentaires
   }
@@ -266,4 +290,5 @@ export class CommentaireService {
   remove(id: string) {
     return `This action removes a #${id} commentaire`;
   }
+
 }

@@ -152,7 +152,9 @@ export class PostController {
   // }
   @Get()
   findAll() {
+    console.log("111111")
     return this.postService.findAll();
+
   }
 
   @Get('savedPosts/:id')
