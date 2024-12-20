@@ -13,6 +13,7 @@ import { EducationModule } from './education/education.module';
 import config from './config/config';
 import {CommentaireModule} from "./commentaire/commentaire.module";
 import { PostulerModule } from './postuler/postuler.module';
+import { CalenderModule } from './calender/calender.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PostulerModule } from './postuler/postuler.module';
     EducationModule,
     CommentaireModule,
     PostulerModule,
+    CalenderModule,
   ],
   controllers: [AppController], // PostController n'est plus nécessaire ici
   providers: [AppService], // PostService n'est plus nécessaire ici

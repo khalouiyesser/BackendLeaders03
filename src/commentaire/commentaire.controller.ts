@@ -59,10 +59,15 @@ export class CommentaireController {
     "videoUrl" : "https://res.cloudinary.com/dcjtuxprn/video/upload/v1734447618/UploadLeaders/1000014911.mp4"
    }
    */
-  @Get('z/Getios')
-  getParPost(@Body('postId') videoUrl: string) {
+  @Get('z/Getios/:id')
+  getParPost(@Param('id') id: string) {
+    return this.commentaireService.findCOmmentParPosts(id);
+  }
+  @Get('/Getios/:postId')
+  getParPostAndroid(@Param('postId') videoUrl: string) {
     return this.commentaireService.findCOmmentParPosts(videoUrl);
   }
+
 
 
 }

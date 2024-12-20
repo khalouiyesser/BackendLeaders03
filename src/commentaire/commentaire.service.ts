@@ -59,7 +59,7 @@ export class CommentaireService {
   // }
 
 
-  async create(createCommentaireDto: CreateCommentaireDto): Promise<Commentaire> {
+  async create(createCommentaireDto: CreateCommentaireDto): Promise<any> {
     const { user, Contenu, post } = createCommentaireDto;
 
     // Rechercher le Post correspondant
@@ -76,9 +76,9 @@ export class CommentaireService {
 
     // Construire le commentaire avec les objets complets user et post
     const newCommentaire = new this.commentaireModel({
-      user: user,  // Utiliser l'objet complet user
+      user: user, // ID de l'utilisateur
       Contenu,
-      post: post,  // Utiliser l'objet complet post
+      post: post, // ID du post
     });
 
     // Sauvegarder le commentaire dans la base de données
@@ -86,14 +86,22 @@ export class CommentaireService {
 
     // Ajouter le commentaire dans la liste des commentaires du Post
     await this.postModel.findByIdAndUpdate(
-        post, // Identifiant du Post à mettre à jour
-        { $push: { commentaires: savedCommentaire._id } }, // Ajouter le commentaire au tableau
-        { new: true } // Retourner la version mise à jour du document (optionnel si nécessaire)
+        post,
+        { $push: { commentaires: savedCommentaire._id } },
+        { new: true }
     );
 
-    // Retourner le commentaire enregistré
-    return savedCommentaire;
+    // Construire un objet enrichi avec les informations utilisateur
+    const enrichedComment = {
+      ...savedCommentaire.toObject(), // Convertir le commentaire en objet JavaScript
+      imageUrl: fullUser.photoUrl, // Ajouter l'URL de la photo de l'utilisateur
+      fullName: `${fullUser.name} ${fullUser.lastname}`, // Ajouter le nom complet de l'utilisateur
+    };
+
+    // Retourner le commentaire enrichi
+    return enrichedComment;
   }
+
 
 
   async createIos(videoUrl: string, user: string, contenu: string): Promise<Commentaire> {
@@ -151,64 +159,6 @@ export class CommentaireService {
     return savedCommentaire;
   }
 
-
-
-
-
-  // async create(createCommentaireDto: CreateCommentaireDto): Promise<Commentaire> {
-  //   // Récupérer l'objet complet du Post
-  //   const post = await this.postModel.findById(createCommentaireDto.post).exec();
-  //   if (!post) {
-  //     throw new NotFoundException('Post not found');
-  //   }
-  //
-  //   // Créer un nouveau commentaire
-  //   const commentaire = new this.commentaireModel({
-  //     user: createCommentaireDto.user,
-  //     Contenu: createCommentaireDto.Contenu,
-  //     // post: post, // Ajouter l'objet complet du Post
-  //   });
-  //
-  //   const savedCommentaire = await commentaire.save();
-  //
-  //   // Ajouter l'objet complet du commentaire au tableau `commentaires` du Post
-  //   post.commentaires.push(savedCommentaire);
-  //
-  //   // Sauvegarder le Post
-  //
-  //   await post.save();
-  //
-  //   return this.commentaireModel.create(savedCommentaire);
-  // }
-
-
-  // async findCommentParVideo(videoUrl: string): Promise<Commentaire[]> {
-  //   // Récupérer tous les posts
-  //   const posts = await this.postService.findAll();
-  //
-  //   // Trouver le post correspondant à l'URL de la vidéo
-  //   const post = posts.find((post) => post.videoUrl === videoUrl);
-  //
-  //   // Vérifier si le post a été trouvé
-  //   if (!post) {
-  //     throw new NotFoundException('Post not found');
-  //   }
-  //
-  //   const comments = []
-  //   const listes = await this.commentaireModel.find({post: post._id}).exec();
-  //   for (const comment of listes) {
-  //     const user = await this.userModel.findById(comment.user)
-  //     if (user){
-  //       comment.populate('imageUrl' : user.photoUrl,
-  //     'fullName' : user.name + " " + user.lastname,)
-  //       comments.push(comment);
-  //     }
-  //
-  //   }
-  //   // Récupérer les commentaires associés à ce post
-  //   // return this.commentaireModel.find({ post: post._id }).exec(); // Utiliser _id pour la recherche
-  //   return comments
-  // }
 
 
   async findCommentParVideo(idPost: string): Promise<Commentaire[]> {

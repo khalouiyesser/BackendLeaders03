@@ -109,6 +109,7 @@ export class PostulerService {
     for (const post of posts) {
       const postId = post['id'];
 
+
       // Récupérer toutes les postulations pour ce post
       const postulers = await this.postulerModel.find({ post: postId }).exec();
 
