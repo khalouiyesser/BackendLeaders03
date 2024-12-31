@@ -8,6 +8,11 @@ import {User} from "../auth/schemas/user.schema";
 import {Post} from "../post/entities/post.entity";
 import {ClaudeApi} from "../services/Claude.service";
 import {PostService} from "../post/post.service";
+import {exec} from "child_process";
+import {promisify} from "util";
+import {UploadFileService} from "../services/uploadFile.service";
+import * as fs from "node:fs";
+import * as path from "node:path";
 // import {PostService} from "../post/post.service";
 
 @Injectable()
@@ -18,6 +23,7 @@ export class PostulerService {
                @InjectModel(Post.name) private readonly postModel: Model<Post>,
                private readonly claudeService: ClaudeApi,
                private readonly postService: PostService,
+               private readonly uploadFileService: UploadFileService,
                ) {
   }
 
@@ -109,7 +115,6 @@ export class PostulerService {
     for (const post of posts) {
       const postId = post['id'];
 
-
       // Récupérer toutes les postulations pour ce post
       const postulers = await this.postulerModel.find({ post: postId }).exec();
 
@@ -134,4 +139,121 @@ export class PostulerService {
      // Liste de tous les scores pour tous les posts
   }
 
+
+  // async interview(id: string) {
+  //
+  //   try {
+  //    const execAsync = promisify(exec);
+  //     const post = await this.postService.findOne(id);
+  //     const scriptPath = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\src\\services\\textToSpeech.py';
+  //     const outputDir = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\uploads';
+  //
+  //     const audioFiles = [];
+  //
+  //     for (const question of post.survey) {
+  //       // Échapper la question pour la ligne de commande
+  //       const escapedQuestion = question.replace(/"/g, '\\"');
+  //
+  //       const command = `python "${scriptPath}" "${escapedQuestion}" --output-dir "${outputDir}"`;
+  //
+  //       try {
+  //         const { stdout, stderr } = await execAsync(command);
+  //
+  //         if (stderr) {
+  //           console.error(`Erreur pour la question "${question}":`, stderr);
+  //         } else {
+  //           // stdout est maintenant une string
+  //           const audioPath = stdout.toString().trim();
+  //           if (audioPath) {
+  //             audioFiles.push(audioPath);
+  //           }
+  //         }
+  //       } catch (error) {
+  //         console.error(`Erreur lors de l'exécution de la commande pour la question "${question}":`, error);
+  //       }
+  //     }
+  //
+  //     return audioFiles;
+  //   } catch (error) {
+  //     console.error('Erreur lors du traitement de l\'interview:', error);
+  //     throw error;
+  //   }
+  // }
+
+
+  async interview(id: string) {
+    try {
+      const post = await this.postService.findOne(id);
+      if (!post || !post.survey || !Array.isArray(post.survey)) {
+        throw new Error("Aucun sondage trouvé pour cet identifiant de post");
+      }
+
+      const scriptPath = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\src\\services\\textToSpeech.py';
+      const outputDir = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\uploads';
+      const execAsync = promisify(exec);
+      const audioFiles: string[] = [];
+
+      for (const question of post.survey) {
+        try {
+          // Échapper les guillemets pour éviter les erreurs de commande
+          const escapedQuestion = question.replace(/"/g, '\\"');
+          const command = `python "${scriptPath}" "${escapedQuestion}" --output-dir "${outputDir}"`;
+
+          // Exécuter le script Python
+          const { stdout, stderr } = await execAsync(command);
+
+          if (stderr) {
+            console.error(`Erreur pour la question "${question}": ${stderr}`);
+            continue;
+          }
+
+          // Récupérer le chemin du fichier généré par le script Python
+          const audioFilePath = stdout.toString().trim();
+          console.log(`Chemin du fichier généré: ${audioFilePath}`);
+
+          // Vérifier si le fichier existe
+          if (!fs.existsSync(audioFilePath)) {
+            console.error(`Le fichier audio n'existe pas: ${audioFilePath}`);
+            continue;
+          }
+
+          // Lire le fichier audio
+          const fileBuffer = fs.readFileSync(audioFilePath);
+          const fileName = path.basename(audioFilePath);
+
+          // Créer un objet compatible avec Express.Multer.File
+          const fileObject = {
+            buffer: fileBuffer,
+            originalname: fileName,
+            mimetype: 'audio/mp3' // Vérifie le format de sortie de ton script Python
+          } as Express.Multer.File;
+
+          // Upload du fichier audio vers Cloudinary
+          try {
+            const cloudUrl = await this.uploadFileService.uploadAudio(fileObject);
+            if (cloudUrl) {
+              audioFiles.push(cloudUrl);
+            }
+
+            // Supprimer le fichier local après un upload réussi
+            fs.unlinkSync(audioFilePath);
+          } catch (uploadError) {
+            console.error(`Erreur lors de l'upload vers Cloudinary:`, uploadError);
+          }
+        } catch (questionError) {
+          console.error(`Erreur lors du traitement de la question "${question}":`, questionError);
+        }
+      }
+
+      return {
+        success: true,
+        message: 'Fichiers audio générés et uploadés avec succès',
+        files: audioFiles,
+        total: audioFiles.length
+      };
+    } catch (error) {
+      console.error('Erreur lors du traitement de l\'interview:', error);
+      throw error;
+    }
+  }
 }

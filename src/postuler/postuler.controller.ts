@@ -5,7 +5,8 @@ import { UpdatePostulerDto } from './dto/update-postuler.dto';
 
 @Controller('postuler')
 export class PostulerController {
-  constructor(private readonly postulerService: PostulerService) {}
+  constructor(private readonly postulerService: PostulerService,
+              ) {}
 
   @Post()
   create(@Body() createPostulerDto: CreatePostulerDto) {
@@ -77,5 +78,11 @@ export class PostulerController {
   @Get('usersByPost/:id')
   getUserPostuler(@Param('id') id: string) {
     return this.postulerService.findCandidatByPost(id);
+  }
+
+
+  @Get('interview/:id')
+  async Interview(@Param('id') id: string) {
+    return await this.postulerService.interview(id)
   }
 }

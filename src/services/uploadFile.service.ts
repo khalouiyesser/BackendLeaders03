@@ -14,9 +14,9 @@ import * as ffmpeg from 'fluent-ffmpeg';
 export class UploadFileService {
   constructor(private readonly configService: ConfigService) {
     cloudinary.config({
-      cloud_name: 'dcjtuxprn',
-      api_key: '895521131264718',
-      api_secret: 'KWOMg13-nRR5vh-ZcQQCQ7UZPdc',
+      cloud_name: 'dga2upgt1',
+      api_key: '482298565792626',
+      api_secret: 'I81aXzSFLjkYok7z8ten9lJwpsc',
     });
   }
 
@@ -65,6 +65,22 @@ export class UploadFileService {
 
       cloudinary.uploader.upload_stream(
           { resource_type: 'image',
+            folder: 'UploadLeaders',
+            public_id: file.originalname.split('.')[0] },
+          (error, result: UploadApiResponse) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          },
+      ).end(buffer);
+    });
+  }
+  async uploadAudio(file: Express.Multer.File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      console.log(11111111)
+      const buffer = file.buffer;
+
+      cloudinary.uploader.upload_stream(
+          { resource_type: 'auto',
             folder: 'UploadLeaders',
             public_id: file.originalname.split('.')[0] },
           (error, result: UploadApiResponse) => {
