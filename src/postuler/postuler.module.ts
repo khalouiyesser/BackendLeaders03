@@ -9,6 +9,7 @@ import {Post, PostSchema} from "../post/entities/post.entity";
 import {ClaudeApi} from "../services/Claude.service";
 import {PostModule} from "../post/post.module";
 import {UploadFileService} from "../services/uploadFile.service";
+import {Interview, InterviewSchema} from "../interview/entities/interview.entity";
 // import {PostService} from "../post/post.service";
 
 @Module({
@@ -33,6 +34,13 @@ import {UploadFileService} from "../services/uploadFile.service";
       {
         name: Post.name,
         schema: PostSchema,
+      },
+
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: Interview.name,
+        schema: InterviewSchema,
       },
 
     ]),

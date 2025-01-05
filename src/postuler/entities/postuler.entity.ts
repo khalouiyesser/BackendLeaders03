@@ -14,5 +14,9 @@ export class Postuler {
 
     @Prop()
     score: number;
+
+    @Prop({default : false})
+    interview : boolean
+
 }
 export const PostulerSchema = SchemaFactory.createForClass(Postuler);

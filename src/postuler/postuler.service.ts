@@ -13,6 +13,8 @@ import {promisify} from "util";
 import {UploadFileService} from "../services/uploadFile.service";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { Interview } from '../interview/entities/interview.entity';
+import { log } from 'node:console';
 // import {PostService} from "../post/post.service";
 
 @Injectable()
@@ -21,6 +23,7 @@ export class PostulerService {
   constructor( @InjectModel(Postuler.name) private readonly postulerModel: Model<Postuler>,
                @InjectModel(User.name) private readonly userModel: Model<User>,
                @InjectModel(Post.name) private readonly postModel: Model<Post>,
+               @InjectModel(Interview.name) private readonly interviewModel: Model<Interview>,
                private readonly claudeService: ClaudeApi,
                private readonly postService: PostService,
                private readonly uploadFileService: UploadFileService,
@@ -94,6 +97,7 @@ export class PostulerService {
           photoUrl: user.photoUrl,
           score: postulation.score,
           fullName: user.name + ' ' + user.lastname,
+
         });
       }
     }
@@ -138,48 +142,6 @@ export class PostulerService {
         allScores};
      // Liste de tous les scores pour tous les posts
   }
-
-
-  // async interview(id: string) {
-  //
-  //   try {
-  //    const execAsync = promisify(exec);
-  //     const post = await this.postService.findOne(id);
-  //     const scriptPath = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\src\\services\\textToSpeech.py';
-  //     const outputDir = 'C:\\Users\\Yesser\\WebstormProjects\\BackendLeaders03\\uploads';
-  //
-  //     const audioFiles = [];
-  //
-  //     for (const question of post.survey) {
-  //       // Échapper la question pour la ligne de commande
-  //       const escapedQuestion = question.replace(/"/g, '\\"');
-  //
-  //       const command = `python "${scriptPath}" "${escapedQuestion}" --output-dir "${outputDir}"`;
-  //
-  //       try {
-  //         const { stdout, stderr } = await execAsync(command);
-  //
-  //         if (stderr) {
-  //           console.error(`Erreur pour la question "${question}":`, stderr);
-  //         } else {
-  //           // stdout est maintenant une string
-  //           const audioPath = stdout.toString().trim();
-  //           if (audioPath) {
-  //             audioFiles.push(audioPath);
-  //           }
-  //         }
-  //       } catch (error) {
-  //         console.error(`Erreur lors de l'exécution de la commande pour la question "${question}":`, error);
-  //       }
-  //     }
-  //
-  //     return audioFiles;
-  //   } catch (error) {
-  //     console.error('Erreur lors du traitement de l\'interview:', error);
-  //     throw error;
-  //   }
-  // }
-
 
   async interview(id: string) {
     try {
@@ -245,9 +207,40 @@ export class PostulerService {
         }
       }
 
+      const postulations = await this.postulerModel.find({post : id})
+
+      // for (const postulation of postulations) {
+      //   const createInterview  = {post : id,user : (await postulation).user, questions : audioFiles};
+      //
+      //   await this.interviewModel.create(createInterview)
+      //
+      //   this.postulerModel.findByIdAndUpdate(postulation.id , {interview : true})
+      // }
+      for (const postulation of postulations) {
+        const createInterview = {
+          post: id,
+          user: postulation.user, // Pas besoin d'attendre ici si postulation est déjà une entité.
+          questions: audioFiles,
+        };
+
+        // Création d'une interview
+        await this.interviewModel.create(createInterview);
+
+        // Mise à jour de la valeur de `interview` à `true`
+        const updatedPostulation = await this.postulerModel.findByIdAndUpdate(
+            postulation.id,
+            { interview: true },
+            { new: true } // Retourne le document mis à jour
+        );
+
+        if (!updatedPostulation) {
+          throw new Error(`Failed to update postulation with id: ${postulation.id}`);
+        }
+      }
+
       return {
         success: true,
-        message: 'Fichiers audio générés et uploadés avec succès',
+        message: postulations.length,
         files: audioFiles,
         total: audioFiles.length
       };
@@ -256,4 +249,62 @@ export class PostulerService {
       throw error;
     }
   }
+
+  async postulerByUser(id: string) {
+    // Récupérer toutes les postulations de l'utilisateur
+    const postulations = await this.postulerModel.find({ user: id });
+
+    // Préparer la réponse
+    const response = await Promise.all(
+        postulations.map(async (postulation) => {
+          // Récupérer les détails de la post
+          const postDetails = await this.postService.findOne(postulation.post);
+
+          // Construire l'objet de réponse
+          return {
+            id: postulation._id, // ID de la postulation
+            interview: postulation.interview, // Champ interview
+            title: postDetails.title, // Titre de la post
+            content: postDetails.content, // Contenu de la post
+          };
+        })
+    );
+    log(response)
+
+    // Retourner la réponse complète
+    return response;
+  }
+
+
+
+  async questions(id: string) {
+    // Récupérer une seule postulation liée à la post
+    const postulation = await this.interviewModel.findOne({ post: id });
+
+    // Retourner l'objet postulation trouvé
+    return postulation.questions;
+  }
+
+  async ajoutResponses(idUser: string, idPost: string, listResponse: string[]) {
+    // Trouver l'interview correspondante
+    const interview = await this.interviewModel.findOne({ post: idPost, user: idUser });
+
+    if (!interview) {
+      throw new Error("Interview introuvable pour cet utilisateur et ce post.");
+    }
+
+    // Ajouter les réponses à l'attribut 'responses'
+    interview.reponses = interview.reponses || []; // Assurer que 'responses' est un tableau
+    interview.reponses.push(...listResponse);
+
+    // Mettre à jour l'interview dans la base de données
+    return await this.interviewModel.findByIdAndUpdate(
+      interview._id,
+      { responses: interview.reponses },
+      { new: true } // Retourne l'interview mise à jour
+    );
+  }
+
+
+
 }

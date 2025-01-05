@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PostulerService } from './postuler.service';
 import { CreatePostulerDto } from './dto/create-postuler.dto';
 import { UpdatePostulerDto } from './dto/update-postuler.dto';
+import { log } from 'node:console';
 
 @Controller('postuler')
 export class PostulerController {
@@ -85,4 +86,22 @@ export class PostulerController {
   async Interview(@Param('id') id: string) {
     return await this.postulerService.interview(id)
   }
+
+  @Get('applied/:id')
+  async applied(@Param('id') id: string) {
+    console.log("yess i point on it ")
+    console.log(id)
+    return await this.postulerService.postulerByUser(id)
+  }
+
+
+  @Get('inetviewQuestions/:id')
+  async questions(@Param('id') id: string) {
+    
+
+    // const post =
+    return await this.postulerService.questions(id)
+  }
+
+
 }

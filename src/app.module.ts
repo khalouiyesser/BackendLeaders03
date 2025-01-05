@@ -14,6 +14,7 @@ import config from './config/config';
 import {CommentaireModule} from "./commentaire/commentaire.module";
 import { PostulerModule } from './postuler/postuler.module';
 import { CalenderModule } from './calender/calender.module';
+import { InterviewModule } from './interview/interview.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CalenderModule } from './calender/calender.module';
     CommentaireModule,
     PostulerModule,
     CalenderModule,
+    InterviewModule,
   ],
   controllers: [AppController], // PostController n'est plus nécessaire ici
   providers: [AppService], // PostService n'est plus nécessaire ici
