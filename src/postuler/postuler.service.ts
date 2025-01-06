@@ -263,6 +263,7 @@ export class PostulerService {
           // Construire l'objet de réponse
           return {
             id: postulation._id, // ID de la postulation
+            post : postulation.post,
             interview: postulation.interview, // Champ interview
             title: postDetails.title, // Titre de la post
             content: postDetails.content, // Contenu de la post

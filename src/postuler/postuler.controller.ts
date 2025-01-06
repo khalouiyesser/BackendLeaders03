@@ -104,4 +104,12 @@ export class PostulerController {
   }
 
 
+  @Post('ajouterResponse')
+  async ajouterResponse(@Body('idUser') idUser: string, @Body('idPost') idPost: string,@Body('response') response: string[]) {
+
+
+    // const post =
+    return await this.postulerService.ajoutResponses(idUser,idPost,response)
+  }
+
 }
