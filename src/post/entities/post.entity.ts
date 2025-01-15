@@ -26,6 +26,9 @@ export class Post {
   @Prop({ default: 'hiring' })
   type: string;
 
+  @Prop({ default: false })
+  cloture: string;
+
   @Prop()
   videoUrl: string;
 

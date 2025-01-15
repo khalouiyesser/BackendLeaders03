@@ -1,7 +1,7 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import {exec} from 'child_process';
+import {promisify} from 'util';
 import {UpdateUserDto} from './dto/update-user.dto';
 // import { User } from './entities/user.entity';
 import {Model, Types} from 'mongoose';
@@ -32,8 +32,53 @@ export class UserService {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
-  async updateUser(id: string, updateProfileDto: UpdateUserDto): Promise<User> {
-    return this.userModel.findByIdAndUpdate(id, updateProfileDto, { new: true });
+  async updateUser(id: string, updateProfileDto: UpdateUserDto, videoUrl: string): Promise<User> {
+    // Vérification si l'utilisateur existe
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new Error(`User with id ${id} not found.`);
+    }
+
+    console.log("User found, proceeding with update.");
+
+    // Transcrire la vidéo si une URL est fournie
+    if (videoUrl) {
+      updateProfileDto.profileDescription = await this.transcribeVideo(videoUrl);
+    }
+
+    console.log(`Updated profile description: ${updateProfileDto.profileDescription}`);
+
+    // Mise à jour de l'utilisateur
+    const updatedUser = await this.userModel.findByIdAndUpdate(id, updateProfileDto, { new: true });
+    if (!updatedUser) {
+      throw new Error(`Failed to update user with id ${updatedUser.name} ${updatedUser.lastname}.`);
+    }
+    return updatedUser;
+  }
+
+  async confirme(email: string) {
+    console.log('Début de la vérification de l’utilisateur par email');
+
+    try {
+      // Trouver et mettre à jour l'utilisateur en réglant le champ `verified` à `true`
+      const user = await this.userModel.findOneAndUpdate(
+          { email: email }, // Recherche par email
+          { verified: true }, // Met à jour le champ `verified`
+          { new: true } // Retourne l'utilisateur mis à jour
+      );
+
+      // Vérifier si l'utilisateur existe
+      if (!user) {
+        console.log('Utilisateur non trouvé');
+        throw new Error('Utilisateur introuvable');
+      }
+
+      console.log('Utilisateur vérifié avec succès');
+      return 'Votre email a été vérifié avec succès.';
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l’utilisateur :', error.message);
+      throw new Error('Une erreur est survenue lors de la vérification de l’email.');
+    }
   }
 
 
@@ -92,7 +137,41 @@ export class UserService {
     return { follow: followData, followers: followersData };
   }
 
+/*
+  async savePost(userId: string, postId: string) {
+    // Rechercher le post complet par son ID
+    const fullPost = await this.postModel.findById(postId).exec();
+    if (!fullPost) {
+      throw new NotFoundException('Post not found');
+    }
 
+    // Rechercher l'utilisateur par son ID
+    const user = await this.userModel.findById(userId).exec();
+    const posts = user.savedPost;
+
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+
+    console.log(user)
+    // Sauvegarder l'utilisateur avec la mise à jour
+    for (const post of posts) {
+      if (post._id.toString() === postId) {
+        return "post already saved";
+      }else {
+// Ajouter l'objet complet du post au champ savedPost
+        user.savedPost.push(fullPost);
+        await user.save();
+      }
+    }
+
+
+    // Retourner l'utilisateur mis à jour (ou une partie spécifique si nécessaire)
+    return "user";
+  }
+*/
   async savePost(userId: string, postId: string) {
     // Rechercher le post complet par son ID
     const fullPost = await this.postModel.findById(postId).exec();
@@ -106,15 +185,23 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
+    // Vérifier si le post est déjà sauvegardé
+    const isPostSaved = user.savedPost.some(
+        (post) => post.content === fullPost.content
+    );
+
+    if (isPostSaved) {
+      return 'Post already saved';
+    }
+
     // Ajouter l'objet complet du post au champ savedPost
     user.savedPost.push(fullPost);
 
-    console.log(user)
     // Sauvegarder l'utilisateur avec la mise à jour
     await user.save();
 
-    // Retourner l'utilisateur mis à jour (ou une partie spécifique si nécessaire)
-    return "user";
+    // Retourner un message de succès
+    return 'Post saved successfully';
   }
 
 
@@ -130,6 +217,7 @@ export class UserService {
       // Exécution du script Python
       const { stdout, stderr } = await this.execAsync(command);
 
+      console.log(444444)
 
       // Vérification des erreurs
       if (stderr) {

@@ -23,6 +23,9 @@ export class User extends Document {
   @Prop({ required: false ,default:''})
   score: string;
 
+  @Prop({ required: false ,default:false})
+  verified: boolean;
+
   @Prop({ required: false ,default:''})
   phoneNumber: string;
 

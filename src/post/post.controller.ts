@@ -24,23 +24,23 @@ export class PostController {
   constructor(private readonly postService: PostService,
               private readonly claudeService: ClaudeApi,
               private readonly userService: UserService) {}
-  // constructor(private readonly postService: PostService) {}
 
-  // @Post()
-  // // @UseGuards(AuthenticationGuard)  // Utilise ton guard pour vérifier le token
-  // async create(@Body() createPostDto: CreatePostDto) {
-  //   // Passe l'ID de l'utilisateur extrait du token à la méthode create
-  //   return this.postService.create(createPostDto);  // Utilise l'ID de l'utilisateur pour créer le post
-  // }
 
+
+
+  // badelett feeha lahnee f reponse
   @Get('survey/:id') // Utilisez ':' pour spécifier une variable dans l'URL
   async getSurvey(@Param('id') id: string) {
     const post = await this.postService.findOne(id);
 
-    return post.survey;
+    return {survey : post.survey, post : id};
   }
 
-
+  @Put('editSurvey/:id') // Utilisez ':' pour spécifier une variable dans l'URL
+  async editSurveys(@Param('id') id: string,@Body('survey') survey: string[]) {
+    const post = await this.postService.updateSurveys(id,survey);
+    return post
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('file')) // Gérer l'upload de fichier
@@ -137,22 +137,9 @@ export class PostController {
     return posts;
   }
 
-  //
-  // @Post('saved/:idPost/:idUser')
-  // async savePost(@Param('id') idPost: string,@Param('idUser') idUser: string) {
-  //   const post = this.postService.findOne(idPost);
-  //   const user = this.userService.findOne(idUser);
-  //   if (!user){
-  //     throw new NotFoundException();
-  //   }
-  //   if (!post) {
-  //     throw new NotFoundException();
-  //   }
-  //
-  // }
+
   @Get()
   findAll() {
-    console.log("111111")
     return this.postService.findAll();
 
   }

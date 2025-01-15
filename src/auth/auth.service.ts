@@ -152,11 +152,14 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
 
-    const { name, lastname, phoneNumber, codePostal, website, domaine, photoUrl, posts, Role,follow,followers } = user;
+    const { name, lastname, phoneNumber, codePostal, website, domaine, photoUrl, posts, Role,follow,followers,verified } = user;
 
     // Générer les tokens JWT
     const tokens = await this.generateUserTokens(user);
 
+    if (!user.verified){
+      return "veuillez verifier votre email"
+    }
     return {
       ...tokens,
       name,
@@ -209,9 +212,8 @@ export class AuthService {
   async forgotPassword(email: string) {
     //Check that user exists
 
-    console.log(email)
     const user = await this.UserModel.findOne({ email });
-    console.log(user)
+
 
     if (user) {
       //If user exists, generate password reset link
@@ -246,16 +248,6 @@ export class AuthService {
 
     if (user) {
 
-      //If user exists, generate password reset link
-      /*const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 1);
-
-      const resetToken = nanoid(64);
-      await this.ResetTokenModel.create({
-        token: resetToken,
-        userId: user._id,
-        expiryDate,
-      });*/
       const code = Math.floor(100000 + Math.random() * 900000);
       //Send the link to the user by email
       await this.smsService.sendSms(phoneNumber, code);
@@ -269,15 +261,10 @@ export class AuthService {
 
 
 
-
-  // async mail(){
-  //   this.mailService.sendPasswordResetEmail("khaluiyesser@gmail.com", "hshshqs");
-  // }
-
   async resetPassword(newPassword: string, resetToken: string) {
 
 
-    console.log("11111111")
+
     //Find a valid reset token document
     const token = await this.ResetTokenModel.findOneAndDelete({
       token: resetToken,

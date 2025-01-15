@@ -43,11 +43,6 @@ export class PostService {
 
   async createWithVideo(file: Express.Multer.File, createPostDto: CreatePostDto): Promise<Post> {
 
-    // console.log('File received:', file);
-    // console.log('File size:', file.size);
-    // console.log('File mimetype:', file.mimetype);
-    // console.log('Post DTO:', createPostDto);
-
     console.log(createPostDto.user)
     try {
       // Étape 1 : Créer une vidéo si un fichier est fourni
@@ -68,11 +63,6 @@ export class PostService {
       // Étape 2 : Ajouter l'ID de la vidéo au DTO du post
       const { title, content, user } = createPostDto;
 
-     // const fullUser = await this.userModel.findById(user).exec()
-
-      // if (!fullUser){
-      //   throw new NotFoundException('Post not found');
-      // }
 
       const newPost = new this.postModel({
         title,
@@ -133,7 +123,7 @@ export class PostService {
   }
   async findAll(): Promise<any[]> {
     // Récupération des posts avec les vidéos associées
-    const posts = await this.postModel.find().exec();
+    const posts = await this.postModel.find({cloture : false}).exec();
 
 
    // console.log(posts)
@@ -274,6 +264,11 @@ export class PostService {
 
     // Trouver un post par son _id
     return this.postModel.findById(postId).exec();
+  }
+
+  async updateSurveys(id : string , survey : string[]){
+    return await this.postModel.findByIdAndUpdate(id,{survey : survey},{new : true}).exec();
+
   }
 
   async update(id: string, updatePostDto: UpdatePostDto): Promise<Post | null> {

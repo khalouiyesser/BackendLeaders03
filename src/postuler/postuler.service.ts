@@ -76,7 +76,7 @@ export class PostulerService {
     return `This action removes a #${id} postuler`;
   }
 
-  async findCandidatByPost(postId: string) {
+  /*async findCandidatByPost(postId: string) {
     // Trouver toutes les postulations liées à l'ID de la publication
     const postulations = await this.postulerModel.find({ post: postId });
 
@@ -101,11 +101,41 @@ export class PostulerService {
         });
       }
     }
+    // Retourner la liste triée des candidats
+    return candidats;
+    }
+*/
+  async findCandidatByPost(postId: string) {
+    // Trouver toutes les postulations liées à l'ID de la publication
+    const postulations = await this.postulerModel.find({ post: postId });
 
+    // Préparer une liste pour stocker les résultats
+    const candidats = [];
 
-    // Retourner la liste des candidats
+    // Boucler sur chaque postulation
+    for (const postulation of postulations) {
+      // Trouver l'utilisateur lié à cette postulation
+      const user = await this.userModel.findById(postulation.user);
+
+      if (user) {
+        // Ajouter les données utilisateur au tableau
+        candidats.push({
+          id: user.id,
+          photoUrl: user.photoUrl,
+          score: postulation.score,
+          fullName: `${user.name} ${user.lastname}`,
+        });
+      }
+    }
+
+    // Trier les candidats par score (du plus haut au plus bas)
+    candidats.sort((a, b) => b.score - a.score);
+
+    // Retourner la liste triée des candidats
     return candidats;
   }
+
+
 
   async stats(userId: string) {
     // Récupérer les posts de l'utilisateur
@@ -209,13 +239,6 @@ export class PostulerService {
 
       const postulations = await this.postulerModel.find({post : id})
 
-      // for (const postulation of postulations) {
-      //   const createInterview  = {post : id,user : (await postulation).user, questions : audioFiles};
-      //
-      //   await this.interviewModel.create(createInterview)
-      //
-      //   this.postulerModel.findByIdAndUpdate(postulation.id , {interview : true})
-      // }
       for (const postulation of postulations) {
         const createInterview = {
           post: id,
@@ -233,6 +256,11 @@ export class PostulerService {
             { new: true } // Retourne le document mis à jour
         );
 
+        const updatedPost = await this.postModel.findByIdAndUpdate(id,{cloture : true},{new : true});
+
+        if (!updatedPost) {
+          throw new Error(`Failed to update postulation with id: ${postulation.id}`);
+        }
         if (!updatedPostulation) {
           throw new Error(`Failed to update postulation with id: ${postulation.id}`);
         }

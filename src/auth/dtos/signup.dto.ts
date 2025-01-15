@@ -30,7 +30,7 @@ export class SignupDto {
 
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   website: string;
 
   @IsString()

@@ -24,6 +24,9 @@ export class CreatePostDto {
   nbLikes: number;
 
   @IsOptional()
+  cloture: boolean;
+
+  @IsOptional()
   @IsString()
   type : string
 

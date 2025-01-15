@@ -230,10 +230,8 @@ export class MailService {
   // Méthode pour envoyer l'email de vérification
   async sendEmailVerif(email: string, fullName: string) {
 
-
-    console.log(email + fullName)
     const mailOptions = {
-      from: 'yesser.khaloui@etudiant-fst.utm.tn',
+      from: '"EchoTalent" <yesser.khaloui@etudiant-fst.utm.tn>',
       to: email,
       subject: 'Bienvenue sur EchoTalent 🎉',
       html: `
@@ -244,7 +242,7 @@ export class MailService {
             <p>
               Merci d'avoir rejoint <strong>EchoTalent</strong>. Cliquez ci-dessous pour confirmer votre email.
             </p>
-            <a href="https://echotalent.com/confirm?email=${encodeURIComponent(email)}"
+            <a href="http://192.168.1.101:3000/user/confirme/${email}"
               style="background-color: #0066ff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">
               Confirmer
             </a>
