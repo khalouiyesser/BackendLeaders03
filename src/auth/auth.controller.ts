@@ -13,7 +13,7 @@ import { extname } from 'path';
 
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Auth')
+@ApiTags('Authentification')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

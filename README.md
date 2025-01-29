@@ -57,6 +57,30 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+```bash
+create environment file 
+
+JWT_SECRET= <your jwt_secret_key>
+MONGO_URL=<your database_url>
+
+cloudinary 
+
+CLOUD_NAME=<your cloudinary_name>
+CLOUD_API_KEY=<your api_key>
+CLOUD_API_SECRET_KEY=<your api_secret_key>
+
+
+TWILIO_ACCOUNT_SID=<your twillio_account>
+TWILIO_AUTH_TOKEN=<your auth_token>
+TWILIO_PHONE_NUMBER=<your twillio_number>
+
+
+ANTHROPIC_API_KEY=<your anthropic_key>
+
+
+
+```
+
 
 ## Support
 
